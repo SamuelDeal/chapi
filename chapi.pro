@@ -4,31 +4,34 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra
 
-SOURCES += main.cpp \
-    helloer.cpp \
-    networkconfig.cpp \
-    etime.cpp \
-    nlprotocol.cpp \
-    config.cpp \
-    systemutils.cpp \
-    log.cpp \
-    videohub.cpp \
-    server.cpp \
-    servercnx.cpp \
-    chapi.cpp
+target.path = /usr/bin/chapi
+INSTALLS += target
+
+SOURCES += src/main.cpp \
+    src/helloer.cpp \
+    src/networkconfig.cpp \
+    src/etime.cpp \
+    src/nlprotocol.cpp \
+    src/config.cpp \
+    src/systemutils.cpp \
+    src/log.cpp \
+    src/videohub.cpp \
+    src/server.cpp \
+    src/servercnx.cpp \
+    src/chapi.cpp
 
 HEADERS += \
-    helloer.h \
-    const.h \
-    networkconfig.h \
-    etime.h \
-    nlprotocol.h \
-    config.h \
-    stringutils.h \
-    systemutils.h \
-    log.h \
-    videohub.h \
-    server.h \
-    servercnx.h \
-    chapi.h
+    src/helloer.h \
+    src/const.h \
+    src/networkconfig.h \
+    src/etime.h \
+    src/nlprotocol.h \
+    src/config.h \
+    src/stringutils.h \
+    src/systemutils.h \
+    src/log.h \
+    src/videohub.h \
+    src/server.h \
+    src/servercnx.h \
+    src/chapi.h
 
