@@ -5,9 +5,15 @@
 #include "log.h"
 
 int main() {
-    initLog(false);
+    try{
+        initLog(false);
 
-    Chapi chapi;
-    chapi.exec();
-    std::cout << "Ciao" << std::endl;
+        Chapi chapi;
+        chapi.exec();
+        std::cout << "Ciao" << std::endl;
+    }
+    catch(...){
+        return 1;
+    }
+    return 0;
 }

@@ -42,7 +42,7 @@ int Server::getSocketFd() const {
     return _socketFd;
 }
 
-int Server::onNewCnx() {
+void Server::onNewCnx() {
 
 }
 

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <syslog.h>
+#include <cerrno>
 
 extern void initLog(bool useSysLog);
 extern void cleanLog();

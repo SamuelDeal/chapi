@@ -72,7 +72,10 @@ int SystemUtils::initTimer(itimerspec *interval, unsigned int msDelay, bool repe
 
 void SystemUtils::readTimer(int timerFd){
     uint64_t data;
-    read(timerFd, &data, sizeof(uint64_t));
+    int result = read(timerFd, &data, sizeof(uint64_t));
+    if(result == -1){
+        log(LOG_ERR, "unable to read file descriptors: %d, %s", result, strerror(errno));
+    }
 }
 
 std::string exec(const char* cmd) {

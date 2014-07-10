@@ -11,7 +11,7 @@ public:
     ~Server();
 
     int getSocketFd() const;
-    int onNewCnx();
+    void onNewCnx();
 
 private:
     int _socketFd;
