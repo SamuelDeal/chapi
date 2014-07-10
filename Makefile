@@ -8,8 +8,7 @@ OBJS = $(SRCS:.cpp=.o)
 CPPFLAGS += -std=c++11 -Wall -O3
 LDFLAGS += -lpthread -Wall -O3
 LIBS +=
-CC = 'g++'
-LINKER = 'g++'
+CXX = g++
 
 DEPS := $(patsubst %.o,%.d,$(OBJS))
 
@@ -24,12 +23,12 @@ clean_tmp:
 	@echo "temporary files cleaned"
 
 %.o: %.cpp
-	$(CC) -D_REENTRANT -c $(CPPFLAGS) -o $@ $<
+	$(CXX) -D_REENTRANT -c $(CPPFLAGS) -o $@ $<
 
 chapi: $(OBJS)
-	$(LINKER) -o $@ $^ $(LIBS) $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 deps: $(SOURCES)
-	$(CC) -MD -E $(SOURCES) > /dev/null
+	$(CXX) -MD -E $(SOURCES) > /dev/null
 
 -include $(DEPS)
