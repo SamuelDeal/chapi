@@ -55,8 +55,12 @@ void Helloer::sayHello() {
     msg += SystemUtils::getCurrentIp();
     msg += "\n";
 
-    if(-1 == sendto(_socket, msg.c_str(), msg.length(), 0, (struct sockaddr *)&recvaddr, sizeof(recvaddr))) {
+    int sent = sendto(_socket, msg.c_str(), msg.length(), 0, (struct sockaddr *)&recvaddr, sizeof(recvaddr));
+    if(-1 == sent) {
         log(LOG_ERR, "say hello : send failed");
+    }
+    else{
+        log(LOG_DEBUG, "say hello : sent %d", sent);
     }
 }
 
