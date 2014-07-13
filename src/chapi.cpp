@@ -10,14 +10,7 @@
 #include "log.h"
 
 Chapi::Chapi() {
-    _cfg.load();
-    _vHub = NULL;
-    _vHub = new VideoHub(2, "192.168.10.51",
-             std::bind(&Chapi::onInputChanged, this, std::placeholders::_1),
-             std::bind(&Chapi::onStatusChanged, this, std::placeholders::_1));
-
     sigset_t mask;
-
     sigemptyset(&mask);
     sigaddset(&mask, SIGUSR1);
     sigaddset(&mask, SIGUSR2);
@@ -29,6 +22,12 @@ Chapi::Chapi() {
     if(_signalFd == -1) {
         throw "signalfd failed!";
     }
+
+    _cfg.load();
+    _vHub = NULL;
+    _vHub = new VideoHub(2, "192.168.10.51",
+             std::bind(&Chapi::onInputChanged, this, std::placeholders::_1),
+             std::bind(&Chapi::onStatusChanged, this, std::placeholders::_1));
 }
 
 Chapi::~Chapi() {
