@@ -33,6 +33,7 @@ Helloer::Helloer()
         throw "listener bind failed";
     }
     fcntl(_socket, F_SETFL, O_NONBLOCK);
+    log(LOG_DEBUG, "helloer constructor");
     sayHello();
 }
 
