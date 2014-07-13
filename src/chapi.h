@@ -22,6 +22,8 @@ private:
     Helloer _helloer;
     Server _server;
     VideoHub *_vHub;
+
+    int _signalFd;
 };
 
 #endif // CHAPI_H

@@ -34,7 +34,9 @@ Helloer::Helloer()
     }
     fcntl(_socket, F_SETFL, O_NONBLOCK);
     log(LOG_DEBUG, "helloer constructor");
-    sayHello();
+    if(SystemUtils::isConneted()){
+        sayHello();
+    }
 }
 
 Helloer::~Helloer() {

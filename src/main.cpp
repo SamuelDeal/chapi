@@ -1,16 +1,15 @@
-#include <iostream>
-#include <cstring>
-
 #include "chapi.h"
 #include "log.h"
 
 int main() {
+    initLog(false);
     try{
-        initLog(false);
-
         Chapi chapi;
         chapi.exec();
-        std::cout << "Ciao" << std::endl;
+    }
+    catch(char const*err) {
+        log(LOG_ERR, "%s", err);
+        return 1;
     }
     catch(...){
         return 1;

@@ -20,11 +20,38 @@ std::string SystemUtils::getCurrentMacAddress() {
 }
 
 
+bool SystemUtils::isConneted(){
+    struct ifaddrs * ifAddrStruct=NULL;
+    struct ifaddrs * ifa=NULL;
+    void * tmpAddrPtr=NULL;
+    bool foundEth0 = false;
+    getifaddrs(&ifAddrStruct);
+
+    for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if(ifa->ifa_addr->sa_family != AF_INET) {
+            continue; //not IPv4, ignored
+        }
+
+        tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+
+        char addressBuffer[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+        if(strcmp(ifa->ifa_name, "eth0") == 0){
+            foundEth0 = true;
+            break;
+        }
+    }
+    if (ifAddrStruct!=NULL) {
+        freeifaddrs(ifAddrStruct);
+    }
+    return foundEth0;
+}
+
 std::string SystemUtils::getCurrentIp() {
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
-    std::string result;
+    std::string result = "127.0.0.1";
     getifaddrs(&ifAddrStruct);
 
     for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
