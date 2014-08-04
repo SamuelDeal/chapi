@@ -2,7 +2,7 @@ TEMPLATE = app
 CONFIG += console static c++-11
 CONFIG -= qt
 
-QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -lwiringPi -lrt
+QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -lwiringPi -lrt -lpthread
 
 target.path = /usr/bin/chapi
 INSTALLS += target

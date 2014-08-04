@@ -5,8 +5,8 @@ all: chapi
 SRCS = $(shell find . -type f -name '*.cpp')
 OBJS = $(SRCS:.cpp=.o)
 
-CPPFLAGS_SPECIFIC += -std=c++11 -Wall -O3 -lwiringPi -lrt
-LDFLAGS_SPECIFIC += -lpthread -Wall -O3 -lwiringPi -lrt
+CPPFLAGS_SPECIFIC += -std=c++11 -Wall -O3 -lwiringPi -lrt -lpthread
+LDFLAGS_SPECIFIC += -lpthread -Wall -O3 -lwiringPi -lrt -lpthread
 LIBS +=
 CXX = g++
 
