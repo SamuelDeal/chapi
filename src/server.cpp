@@ -56,7 +56,7 @@ void Server::onNewCnx() {
 }
 
 void Server::onCnxClose(ServerCnx *cnx) {
-    _cnx.remove_if([](ServerCnx *that) {
+    _cnx.remove_if([&cnx](ServerCnx *that)-> bool {
         return that == cnx;
     });
     delete cnx;

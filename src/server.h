@@ -11,7 +11,7 @@ public:
     ~Server();
 
     int getSocketFd() const;
-    ServerCnx* onNewCnx();
+    void onNewCnx();
     void onCnxClose(ServerCnx*);
     const std::list<ServerCnx*>& getCnx() const;
 
