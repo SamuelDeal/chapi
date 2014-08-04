@@ -25,7 +25,7 @@ Server::Server() {
     if(-1 == bind(_socketFd, (struct sockaddr*) &addr, sizeof(addr))) {
         throw Error::system("listener bind failed");
     }
-    fcntl(_socketFd, F_SETFL, O_NONBLOCK);
+    //fcntl(_socketFd, F_SETFL, O_NONBLOCK);
     listen(_socketFd, 10);
 }
 
@@ -50,7 +50,7 @@ void Server::onNewCnx() {
     if(cnxFd < 0) {
         throw Error::system("listener accept failed");
     }
-    fcntl(cnxFd, F_SETFL, O_NONBLOCK);
+    //fcntl(cnxFd, F_SETFL, O_NONBLOCK);
     ServerCnx *cnx= new ServerCnx(cnxFd, *this);
     _cnx.push_back(cnx);
 }
