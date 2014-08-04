@@ -26,7 +26,8 @@ SOURCES += src/main.cpp \
     src/circuitconfig.cpp \
     src/led.cpp \
     src/error.cpp \
-    src/gpio.cpp
+    src/gpio.cpp \
+    src/buttongroup.cpp
 
 HEADERS += \
     src/helloer.h \
@@ -48,5 +49,6 @@ HEADERS += \
     src/led.h \
     src/pipe.h \
     src/error.h \
-    src/gpio.h
+    src/gpio.h \
+    src/buttongroup.h
 

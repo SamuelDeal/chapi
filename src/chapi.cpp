@@ -41,11 +41,17 @@ Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     for(auto i = outputs.begin(); i != outputs.end(); i++){
         LedGroup *ledGroup = new LedGroup(**i);
         ledGroup->clear();
+        log(LOG_DEBUG, "buttons: %d", ledGroup->getNbrButtons());
         nbrButtonsOutput = std::max(nbrButtonsOutput, (int)ledGroup->getNbrButtons());
         _leds.push_back(ledGroup);
+        for(int i = 0; i < ledGroup->getNbrButtons(); i++){
+            ledGroup->on(i);
+            SystemUtils::delay(1000);
+        }
     }
 
     _nbrButtons = std::min(nbrButtonsInput, nbrButtonsOutput);
+    log(LOG_DEBUG, "buttons final: %d", _nbrButtons);
 }
 
 Chapi::~Chapi() {
@@ -127,6 +133,10 @@ void Chapi::exec() {
             }
             else if(fdsi.ssi_signo == SIGUSR2) {
                 onNetworkStatus(false);
+            }
+            else { //SIGINT or SIGTERM
+                log(LOG_INFO, "signal received, exiting...");
+                exit = true;
             }
         }
         if(FD_ISSET(_helloer.getFd(), &readFsSet)){

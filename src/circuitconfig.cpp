@@ -23,7 +23,7 @@ CircuitConfig::~CircuitConfig() {
 }
 
 void CircuitConfig::load() {
-    std::ifstream cfgFile("home/sam/test_circuit"); //CONFIG_FOLDER "/" CIRCUIT_FILE);
+    std::ifstream cfgFile(CONFIG_FOLDER "/" CIRCUIT_FILE);
     std::string line;
     while(std::getline(cfgFile, line)) {
         line = trim(line);
@@ -72,8 +72,8 @@ void CircuitConfig::load() {
             if(index > 1024){
                 throw Error::config("invalid circuit config");
             }
-            if(_current->pins.size() < index){
-                _current->pins.resize(index, -1);
+            if(_current->pins.size() <= index){
+                _current->pins.resize(index+1, -1);
             }
             _current->pins[index] = value;
         }

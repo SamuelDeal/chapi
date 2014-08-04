@@ -15,7 +15,7 @@ LedGroup::LedGroup(const SRInfo &info):
     for(auto i = info.pins.begin(); i != info.pins.end(); i++){
         if(*i != -1){
             _mapping[*i] = index;
-            _nbrBtns = std::max((int)_nbrBtns, *i);
+            _nbrBtns = std::max((int)_nbrBtns, (*i) + 1);
         }
         ++index;
     }

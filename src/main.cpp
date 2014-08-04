@@ -22,6 +22,8 @@ int main() {
     sigemptyset(&mask);
     sigaddset(&mask, SIGUSR1);
     sigaddset(&mask, SIGUSR2);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGTERM);
     if (sigprocmask(SIG_BLOCK, &mask, NULL) == -1) {
         sigError = errno;
     }
@@ -59,5 +61,6 @@ int main() {
         redLed.blinkNumber(5);
         loop();
     }
+    redLed.off();
     return 0;
 }

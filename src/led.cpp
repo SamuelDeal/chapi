@@ -137,6 +137,8 @@ void* Led::_startBlinking(void*led){
     signal(SIGINT,SIG_IGN); // ignore SIGTERM
     signal(SIGQUIT,SIG_IGN); // ignore SIGTERM
     signal(SIGTERM,SIG_IGN); // ignore SIGTERM
+    signal(SIGUSR1,SIG_IGN);
+    signal(SIGUSR2,SIG_IGN);
     int oldstate;
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
 

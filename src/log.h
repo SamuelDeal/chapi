@@ -15,10 +15,13 @@ extern bool __useSysLog;
    } \
    else{ \
       if(severity <= LOG_ERR){ \
-         fprintf(stderr, "Error: " msg "\n", ##__VA_ARGS__); \
+         fprintf(stderr, "Error: "); \
+         fprintf(stderr, msg, ##__VA_ARGS__); \
+         fprintf(stderr, "\n"); \
       } \
       else{ \
-         printf(msg "\n", ##__VA_ARGS__); \
+         printf(msg, ##__VA_ARGS__); \
+         printf("\n"); \
       } \
    }
 
