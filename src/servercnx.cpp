@@ -2,6 +2,8 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #include "server.h"
 #include "error.h"
@@ -19,16 +21,16 @@ int ServerCnx::getCnxFd() const {
 }
 
 void ServerCnx::onData() {
-    char buffer[1024];
-    int readLength = recv(_cnxFd, bufffer, sizeof(buffer), 0);
-    if(readLength = 0) {
+    char readBuffer[1024];
+    int readLength = recv(_cnxFd, readBuffer, sizeof(readBuffer), 0);
+    if(readLength == 0) {
         _owner.onCnxClose(this);
     }
     else if(readLength < 0) {
         throw Error::system("bad socket read");
     }
     else {
-        _buffer += buffer;
+        _buffer += readBuffer;
         parse();
     }
 }
