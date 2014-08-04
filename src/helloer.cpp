@@ -11,17 +11,18 @@
 #include "const.h"
 #include "log.h"
 #include "systemutils.h"
+#include "error.h"
 
 Helloer::Helloer()
 {
     _socket = socket(PF_INET, SOCK_DGRAM, 0);
     if(-1 == _socket){
-        throw "socket opening failed !";
+        throw Error::system("socket opening failed !");
     }
 
     int broadcast=1;
     if(-1 == setsockopt(_socket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast))) {
-        throw "braodcast opening failed !";
+        throw Error::system("braodcast opening failed !");
     }
 
     struct sockaddr_in recvaddr;
@@ -30,13 +31,10 @@ Helloer::Helloer()
     recvaddr.sin_addr.s_addr = INADDR_ANY;
     memset(recvaddr.sin_zero, '\0', sizeof(recvaddr.sin_zero));
     if(-1 == bind(_socket, (struct sockaddr*) &recvaddr, sizeof(recvaddr))) {
-        throw "listener bind failed";
+        throw Error::system("listener bind failed");
     }
     fcntl(_socket, F_SETFL, O_NONBLOCK);
     log(LOG_DEBUG, "helloer constructor");
-    if(SystemUtils::isConneted()){
-        sayHello();
-    }
 }
 
 Helloer::~Helloer() {

@@ -117,3 +117,12 @@ std::string exec(const char* cmd) {
     pclose(pipe);
     return result;
 }
+
+void SystemUtils::delay(float ms) {
+    struct timespec sleeper, dummy ;
+
+    sleeper.tv_sec = (time_t)(ms / 1000) ;
+    sleeper.tv_nsec = (long)(((long)ms) % 1000) * 1000000 ;
+
+    nanosleep(&sleeper, &dummy) ;
+}

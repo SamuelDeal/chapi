@@ -1,7 +1,9 @@
 #ifndef CONST_H
 #define CONST_H
 
-#define CONFIG_FILE             "/home/sam/cfg.ini"
+#define CONFIG_FOLDER           "/etc/chapi"
+#define CONFIG_FILE             "chapi.conf"
+#define CIRCUIT_FILE             "circuit.conf"
 
 #define ___str(x) #x
 #define STRINGIFY(x) ___str(x)

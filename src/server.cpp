@@ -9,11 +9,12 @@
 
 #include "const.h"
 #include "servercnx.h"
+#include "error.h"
 
 Server::Server() {
     _socketFd = socket(PF_INET, SOCK_STREAM, 0);
     if(-1 == _socketFd){
-        throw "socket opening failed !";
+        throw Error::system("socket opening failed !");
     }
 
     struct sockaddr_in addr;
@@ -22,11 +23,10 @@ Server::Server() {
     addr.sin_addr.s_addr = INADDR_ANY;
     memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
     if(-1 == bind(_socketFd, (struct sockaddr*) &addr, sizeof(addr))) {
-        throw "listener bind failed";
+        throw Error::system("listener bind failed");
     }
-
-    listen(_socketFd, 10);
     fcntl(_socketFd, F_SETFL, O_NONBLOCK);
+    listen(_socketFd, 10);
 }
 
 

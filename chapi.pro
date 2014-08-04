@@ -18,7 +18,12 @@ SOURCES += src/main.cpp \
     src/videohub.cpp \
     src/server.cpp \
     src/servercnx.cpp \
-    src/chapi.cpp
+    src/chapi.cpp \
+    src/ledgroup.cpp \
+    src/circuitconfig.cpp \
+    src/led.cpp \
+    src/error.cpp \
+    src/gpio.cpp
 
 HEADERS += \
     src/helloer.h \
@@ -33,5 +38,12 @@ HEADERS += \
     src/videohub.h \
     src/server.h \
     src/servercnx.h \
-    src/chapi.h
+    src/chapi.h \
+    src/ledgroup.h \
+    src/circuitconfig.h \
+    src/srinfo.h \
+    src/led.h \
+    src/pipe.h \
+    src/error.h \
+    src/gpio.h
 

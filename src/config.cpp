@@ -4,29 +4,36 @@
 #include <sstream>
 
 #include "const.h"
+#include "stringutils.h"
 
 Config::Config(){
+    _isSet = false;
+    load();
 }
 
 void Config::load() {
-    std::ifstream cfgFile(CONFIG_FILE);
+    std::ifstream cfgFile(CONFIG_FOLDER "/" CONFIG_FILE);
     std::string line;
     while(std::getline(cfgFile, line)) {
-        std::istringstream is_line(line);
+        std::istringstream lineStream(line);
         std::string key;
-        if(!std::getline(is_line, key, '=')) {
+        if(!std::getline(lineStream, key, '=')) {
             continue;
         }
         std::string value;
-        if(!std::getline(is_line, value)) {
+        if(!std::getline(lineStream, value)) {
             continue;
         }
-        _kvs[key] = value;
+        _kvs[trim(key)] = trim(value);
     }
 }
 
+bool Config::isSet() const {
+    return _isSet;
+}
+
 void Config::save() {
-    std::ofstream cfgFile(CONFIG_FILE, std::ios_base::out|std::ios_base::trunc);
+    std::ofstream cfgFile(CONFIG_FOLDER "/" CONFIG_FILE, std::ios_base::out|std::ios_base::trunc);
     std::string line;
     for(auto it = _kvs.begin(); it != _kvs.end(); it++){
         cfgFile << it->first << "=" << it->second << "\n";
