@@ -16,6 +16,7 @@
 
 Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     _vHub = NULL;
+    _server = NULL;
     _signalFd = signalfd(-1, &mask, 0);
     if(_signalFd == -1) {
         throw Error::system("signalfd failed");
@@ -96,11 +97,19 @@ void Chapi::exec() {
                 max = std::max(max, fd);
             }
         }
-
-        fd = _server.getSocketFd();
-        if(fd != -1){
-            FD_SET(fd, &readFsSet);
-            max = std::max(max, fd);
+        if(_server != NULL) {
+            fd = _server->getSocketFd();
+            if(fd != -1){
+                FD_SET(fd, &readFsSet);
+                max = std::max(max, fd);
+            }
+            for(auto i = _server->getCnx().begin(); i != server->getCnx().end(); i++){
+                fd = (*i)->getCnxFd();
+                if(fd != -1){
+                    FD_SET(fd, &readFsSet);
+                    max = std::max(max, fd);
+                }
+            }
         }
 
         if(select(max+1, &readFsSet, NULL, NULL, NULL) == -1) {
@@ -121,9 +130,6 @@ void Chapi::exec() {
         if(FD_ISSET(_helloer.getFd(), &readFsSet)){
             _helloer.onMsgReceived();
         }
-        if(FD_ISSET(_server.getSocketFd(), &readFsSet)){
-            _server.onNewCnx();
-        }
         if(_vHub != NULL){
             if((_vHub->getSocketFd() != -1) && FD_ISSET(_vHub->getSocketFd(), &readFsSet)){
                 _vHub->onSocketData();
@@ -133,6 +139,16 @@ void Chapi::exec() {
             }
             if((_vHub->getPingTimerFd() != -1) && FD_ISSET(_vHub->getPingTimerFd(), &readFsSet)){
                 _vHub->onPingTimer();
+            }
+        }
+        if(_server != NULL) {
+            for(auto i = _server->getCnx().begin(); i != server->getCnx().end(); i++){
+                if(FD_ISSET((*i)->getCnxFd(), &readFsSet)) {
+                    (*i)->onData();
+                }
+            }
+            if(FD_ISSET(_server.getSocketFd(), &readFsSet)){
+                _server.onNewCnx();
             }
         }
     }
@@ -166,11 +182,18 @@ void Chapi::onNetworkStatus(bool connected) {
         else{
            _redLed.on();
         }
+        if(_server == NULL){
+            _server = new Server();
+        }
     }
     else{
         log(LOG_DEBUG, "deconnected");
         _greenLed.off();
         _redLed.blinkQuickly();
+        if(_server != NULL){
+            delete _server;
+            _server = NULL;
+        }
     }
 }
 

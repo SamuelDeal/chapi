@@ -36,14 +36,35 @@ Server::~Server(){
         delete *(_cnx.begin());
         _cnx.pop_front();
     }
+
 }
 
 int Server::getSocketFd() const {
     return _socketFd;
 }
 
-void Server::onNewCnx() {
+ServerCnx* Server::onNewCnx() {
+    struct sockaddr_in remoteAddr;
+    socklen_t addrSize = sizeof(remoteAddr);
+    int cnxFd = accept(_socketFd, (struct sockaddr*) &remoteAddr, &addrSize);
+    if(cnxFd < 0) {
+        throw Error::system("listener accept failed");
+    }
 
+    ServerCnx *cnx= new ServerCnx(cnxFd, *this);
+    _cnx.push_back(cnx);
+    return cnx;
+}
+
+void Server::onCnxClose(ServerCnx *cnx) {
+    _cnx.remove_if([](ServerCnx *that) {
+        return that == cnx;
+    });
+    delete cnx;
+}
+
+const std::list<ServerCnx*>& Server::getCnx() const {
+    return _cnx;
 }
 
 

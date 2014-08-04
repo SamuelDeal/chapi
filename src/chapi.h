@@ -9,6 +9,7 @@
 #include "led.h"
 
 class LedGroup;
+class ServerCnx;
 
 class Chapi {
 
@@ -26,13 +27,14 @@ private:
 
     Config _cfg;
     Helloer _helloer;
-    Server _server;
+    Server *_server;
     VideoHub *_vHub;
     CircuitConfig _circuit;
     Led _greenLed;
     Led &_redLed;
     int _nbrButtons;
     std::list<LedGroup*> _leds;
+    std::list<ServerCnx*> _serverCnxs;
 
     int _signalFd;
 };
