@@ -1,9 +1,11 @@
 #ifndef SERVERCNX_H
 #define SERVERCNX_H
 
-#include <string>
+#include "nlprotocol.h"
+#include "config.h"
 
 class Server;
+
 
 class ServerCnx {
 public:
@@ -12,13 +14,15 @@ public:
 
     int getCnxFd() const;
     void onData();
+    void sendConfig(Config &cfg, int nbrButtons);
 
 private:
-    void parse();
+    void onCommand(NlCommand);
+    void onFailure(NlCommand);
+    void onClose(NlCommand);
 
-    int _cnxFd;
+    NlProtocol *_protocol;
     Server &_owner;
-    std::string _buffer;
 };
 
 #endif // SERVERCNX_H

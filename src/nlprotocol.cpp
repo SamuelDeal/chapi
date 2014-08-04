@@ -5,11 +5,16 @@
 
 #include "stringutils.h"
 
-NlProtocol::NlProtocol(int socketFd, Callback onReceived, Callback onFailure) {
+NlProtocol::NlProtocol(int socketFd, Callback onReceived, Callback onFailure, Callback onClose) {
     _socketFd = socketFd;
     _onCommandFailed = onFailure;
     _onCommandReceived = onReceived;
+    _onClose = onClose;
     _reading = false;
+}
+
+int NlProtocol::getSocketFd() const {
+    return _socketFd;
 }
 
 void NlProtocol::sendCommand(const std::string& cmd){
@@ -51,7 +56,13 @@ void NlProtocol::read() {
     _reading = true;
     char buffer[512];
     int readBytes = recv(_socketFd, buffer, sizeof(buffer), 0);
-    while(readBytes > 0) {
+    if(readBytes == 0){
+        _onClose(_sendingCommand);
+    }
+    else if(readBytes < 0) {
+        _onCommandFailed(_sendingCommand);
+    }
+    else {
         buffer[readBytes] = '\0';
         _readBuffer.append(buffer);
 
@@ -72,10 +83,9 @@ void NlProtocol::read() {
             }
             pos = _readBuffer.find('\n', 0);
         }
-        readBytes = recv(_socketFd, buffer, sizeof(buffer), 0);
-    }
-    if(_readBuffer.empty()){
-        _reading = false;
+        if(_readBuffer.empty()){
+            _reading = false;
+        }
     }
 }
 

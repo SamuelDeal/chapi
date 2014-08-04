@@ -57,8 +57,10 @@ void VideoHub::connect() {
     else {
         fcntl(_socketFd, F_SETFL, O_NONBLOCK);
         _protocol = new NlProtocol(_socketFd,
-                                   std::bind(&VideoHub::onDataReceived, this, std::placeholders::_1),
-                                   std::bind(&VideoHub::onFailure, this, std::placeholders::_1));
+               std::bind(&VideoHub::onDataReceived, this, std::placeholders::_1),
+               std::bind(&VideoHub::onFailure, this, std::placeholders::_1),
+               std::bind(&VideoHub::onFailure, this, std::placeholders::_1)
+            );
         _onStatusChanged(ReadingConfig);
     }
 }

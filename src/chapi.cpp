@@ -152,7 +152,8 @@ void Chapi::exec() {
             }
             if(FD_ISSET(_server->getSocketFd(), &readFsSet)){
                 log(LOG_DEBUG, "creating cnx");
-                _server->onNewCnx();
+                ServerCnx *newCnx = _server->onNewCnx();
+                newCnx->sendConfig(_cfg, _nbrButtons);
             }
         }
     }

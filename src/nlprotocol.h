@@ -16,12 +16,13 @@ class NlProtocol {
 public:
     typedef std::function<void(NlCommand)> Callback;
 
-    NlProtocol(int socketFd, Callback onReceived, Callback onFailure);
+    NlProtocol(int socketFd, Callback onReceived, Callback onFailure, Callback onClose);
 
     void sendCommand(const std::string& cmd, const std::list<std::string> &lines);
     void sendCommand(const std::string& cmd, const std::string &line);
     void sendCommand(const std::string& cmd);
     void read();
+    int getSocketFd() const;
 
 private:
     void send(const NlCommand& cmd);
@@ -37,6 +38,7 @@ private:
 
     Callback _onCommandFailed;
     Callback _onCommandReceived;
+    Callback _onClose;
 };
 
 #endif // NLPROTOCOL_H
