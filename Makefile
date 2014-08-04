@@ -1,14 +1,21 @@
 all: chapi
 
-.PHONY: all clean clean_tmp clear deps
+.PHONY: all clean clean_tmp clear deps tata
 
 SRCS = $(shell find . -type f -name '*.cpp')
 OBJS = $(SRCS:.cpp=.o)
 
-CPPFLAGS_SPECIFIC += -std=c++11 -Wall -O3 -lwiringPi -lrt -lpthread
-LDFLAGS_SPECIFIC += -lpthread -Wall -O3 -lwiringPi -lrt -lpthread
+
+
+CPPFLAGS_SPECIFIC += -std=c++11 -Wall -O3 -lrt -lpthread
+LDFLAGS_SPECIFIC += -lpthread -Wall -O3 -lrt -lpthread
 LIBS +=
 CXX = g++
+
+ifneq "$(findstring NOGPIO, $(CPPFLAGS))" "NOGPIO"
+CPPFLAGS_SPECIFIC += -lwiringPi
+LDFLAGS_SPECIFIC += -lwiringPi
+endif
 
 DEPS := $(patsubst %.o,%.d,$(OBJS))
 
