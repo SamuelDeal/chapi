@@ -50,7 +50,7 @@ void Server::onNewCnx() {
     if(cnxFd < 0) {
         throw Error::system("listener accept failed");
     }
-
+    fcntl(cnxFd, F_SETFL, O_NONBLOCK);
     ServerCnx *cnx= new ServerCnx(cnxFd, *this);
     _cnx.push_back(cnx);
 }

@@ -1,6 +1,7 @@
 #ifndef SERVERCNX_H
 #define SERVERCNX_H
 
+#include <string>
 
 class Server;
 
@@ -13,8 +14,11 @@ public:
     void onData();
 
 private:
+    void parse();
+
     int _cnxFd;
     Server &_owner;
+    std::string _buffer;
 };
 
 #endif // SERVERCNX_H
