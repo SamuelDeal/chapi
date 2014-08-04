@@ -12,7 +12,7 @@ public:
 
     int getSocketFd() const;
     ServerCnx* onNewCnx();
-    void onCnxClose(ServerCnx*);
+    void cleanClosedCnx();
     const std::list<ServerCnx*>& getCnx() const;
 
 private:

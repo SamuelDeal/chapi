@@ -150,6 +150,7 @@ void Chapi::exec() {
                     (*i)->onData();
                 }
             }
+            _server->cleanClosedCnx();
             if(FD_ISSET(_server->getSocketFd(), &readFsSet)){
                 log(LOG_DEBUG, "creating cnx");
                 ServerCnx *newCnx = _server->onNewCnx();

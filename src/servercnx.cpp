@@ -7,8 +7,10 @@
 
 #include "server.h"
 #include "error.h"
+#include "const.h"
 
-ServerCnx::ServerCnx(int cnxFd, Server &owner) : _owner(owner) {
+ServerCnx::ServerCnx(int cnxFd) {
+    _closed = false;
     _protocol = new NlProtocol(cnxFd,
        std::bind(&ServerCnx::onCommand, this, std::placeholders::_1),
        std::bind(&ServerCnx::onFailure, this, std::placeholders::_1),
@@ -20,11 +22,18 @@ ServerCnx::~ServerCnx() {
     delete _protocol;
 }
 
+bool ServerCnx::isClosed() const {
+    return _closed;
+}
+
 int ServerCnx::getCnxFd() const {
     return _protocol->getSocketFd();
 }
 
 void ServerCnx::onData() {
+    if(_closed) {
+        return;
+    }
     _protocol->read();
 }
 
@@ -39,10 +48,11 @@ void ServerCnx::onFailure(NlCommand cmd) {
 }
 
 void ServerCnx::onClose(NlCommand cmd) {
-    _owner.onCnxClose(this);
+    _closed = true;
 }
 
 void ServerCnx::sendConfig(Config &cfg, int nbrButtons) {
+    _protocol->sendCommand("VERSION", CURRENT_VERSION);
     _protocol->sendCommand("CONFIG_BEGIN");
 
     _protocol->sendCommand("CONFIG_SET", "0");

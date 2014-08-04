@@ -9,10 +9,11 @@ class Server;
 
 class ServerCnx {
 public:
-    ServerCnx(int cnxFd, Server &owner);
+    ServerCnx(int cnxFd);
     ~ServerCnx();
 
     int getCnxFd() const;
+    bool isClosed() const;
     void onData();
     void sendConfig(Config &cfg, int nbrButtons);
 
@@ -22,7 +23,7 @@ private:
     void onClose(NlCommand);
 
     NlProtocol *_protocol;
-    Server &_owner;
+    bool _closed;
 };
 
 #endif // SERVERCNX_H

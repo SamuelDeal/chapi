@@ -25,7 +25,6 @@ Server::Server() {
     if(-1 == bind(_socketFd, (struct sockaddr*) &addr, sizeof(addr))) {
         throw Error::system("listener bind failed");
     }
-    //fcntl(_socketFd, F_SETFL, O_NONBLOCK);
     listen(_socketFd, 10);
 }
 
@@ -50,26 +49,22 @@ ServerCnx* Server::onNewCnx() {
     if(cnxFd < 0) {
         throw Error::system("listener accept failed");
     }
-    //fcntl(cnxFd, F_SETFL, O_NONBLOCK);
-    ServerCnx *cnx= new ServerCnx(cnxFd, *this);
+    ServerCnx *cnx= new ServerCnx(cnxFd);
     _cnx.push_back(cnx);
     return cnx;
 }
 
-void Server::onCnxClose(ServerCnx *cnx) {
-    _cnx.remove_if([&cnx](ServerCnx *that)-> bool {
-        return that == cnx;
+void Server::cleanClosedCnx() {
+    _cnx.remove_if([](ServerCnx *cnx)-> bool {
+        if(cnx->isClosed()){
+            delete cnx;
+            return true;
+        }
+        return false;
     });
-    delete cnx;
 }
 
 const std::list<ServerCnx*>& Server::getCnx() const {
     return _cnx;
 }
 
-
-
-/*
-int _serverSocketFd;
-std::list<ServerCnx*> _cnx;
-*/
