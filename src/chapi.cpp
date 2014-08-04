@@ -149,8 +149,8 @@ void Chapi::exec() {
                     (*i)->onData();
                 }
             }
-            if(FD_ISSET(_server.getSocketFd(), &readFsSet)){
-                _server.onNewCnx();
+            if(FD_ISSET(_server->getSocketFd(), &readFsSet)){
+                _server->onNewCnx();
             }
         }
     }
