@@ -22,7 +22,7 @@ int ServerCnx::getCnxFd() const {
 
 void ServerCnx::onData() {
     char readBuffer[1024];
-    int readLength = recv(_cnxFd, readBuffer, sizeof(readBuffer), 0);
+    int readLength = recv(_cnxFd, readBuffer, sizeof(readBuffer)-1, 0);
     if(readLength == 0) {
         _owner.onCnxClose(this);
     }
@@ -30,6 +30,7 @@ void ServerCnx::onData() {
         throw Error::system("bad socket read");
     }
     else {
+        readBuffer[readLength] = '\0';
         _buffer += readBuffer;
         parse();
     }
