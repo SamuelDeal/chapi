@@ -13,6 +13,7 @@
 #include "error.h"
 #include "systemutils.h"
 #include "ledgroup.h"
+#include "buttongroup.h"
 #include "server.h"
 #include "servercnx.h"
 
@@ -29,11 +30,12 @@ Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
         onNetworkStatus(true);
     }
 
-    int nbrButtonsInput = 8;
-
+    int nbrButtonsInput = 0;
     std::list<SRInfo*> inputs = _circuit.getInputs();
     for(auto i = inputs.begin(); i != inputs.end(); i++){
-        //TODO
+        ButtonGroup *btnGroup = new ButtonGroup(**i);
+        nbrButtonsInput += btnGroup->getNbrButtons();
+        _btns.push_back(btnGroup);
     }
 
     int nbrButtonsOutput = 0;
@@ -41,13 +43,8 @@ Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     for(auto i = outputs.begin(); i != outputs.end(); i++){
         LedGroup *ledGroup = new LedGroup(**i);
         ledGroup->clear();
-        log(LOG_DEBUG, "buttons: %d", ledGroup->getNbrButtons());
         nbrButtonsOutput = std::max(nbrButtonsOutput, (int)ledGroup->getNbrButtons());
         _leds.push_back(ledGroup);
-        for(int i = 0; i < ledGroup->getNbrButtons(); i++){
-            ledGroup->on(i);
-            SystemUtils::delay(1000);
-        }
     }
 
     _nbrButtons = std::min(nbrButtonsInput, nbrButtonsOutput);
@@ -60,6 +57,10 @@ Chapi::~Chapi() {
     }
 
     for(auto i = _leds.begin(); i != _leds.end(); i++){
+        delete(*i);
+    }
+
+    for(auto i = _btns.begin(); i != _btns.end(); i++){
         delete(*i);
     }
 }

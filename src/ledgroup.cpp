@@ -58,7 +58,7 @@ void LedGroup::off(unsigned char index, bool buffered) {
 void LedGroup::write() {
     _latchPin.write(Gpio::Low);
     SystemUtils::delay(1);
-    for(unsigned char i=0; i < _size; i++) {
+    for(unsigned char i=_size; i >0; --i) {
         _clockPin.write(Gpio::Low);
         _dataPin.write(_values[i] ? Gpio::High : Gpio::Low);
         SystemUtils::delay(1);

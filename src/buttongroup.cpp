@@ -1,8 +1,21 @@
 #include "buttongroup.h"
 
-ButtonGroup::ButtonGroup()
+ButtonGroup::ButtonGroup(const SRInfo &info) :
+    _dataPin(info.dataPin), _clockPin(info.clockPin), _latchPin(info.latchPin)
 {
+    _size = info.size;
+    _nbrBtns = _size;
 }
+
+ButtonGroup::~ButtonGroup(){
+}
+
+unsigned char ButtonGroup::getNbrButtons() const {
+    return _nbrBtns;
+}
+
+
+
 
 /*
 #include <wiringPi.h>

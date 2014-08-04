@@ -13,7 +13,7 @@ public:
     static int initTimer(itimerspec *interval, unsigned int msDelay, bool repeat = false);
     static bool isConneted();
     static void readTimer(int timerFd);
-    static void delay(float ms);
+    static void delay(float usec);
 
 private:
     SystemUtils();

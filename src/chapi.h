@@ -8,6 +8,7 @@
 #include "led.h"
 
 class LedGroup;
+class ButtonGroup;
 class Server;
 class ServerCnx;
 
@@ -34,6 +35,7 @@ private:
     Led &_redLed;
     int _nbrButtons;
     std::list<LedGroup*> _leds;
+    std::list<ButtonGroup*> _btns;
     std::list<ServerCnx*> _serverCnxs;
 
     int _signalFd;
