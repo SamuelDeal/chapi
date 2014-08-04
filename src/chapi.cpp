@@ -25,11 +25,8 @@ Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     if(SystemUtils::isConneted()){
         onNetworkStatus(true);
     }
-    if(_cfg.isSet()){
-        onConfigSet();
-    }
 
-    int nbrButtonsInput = 0;
+    int nbrButtonsInput = 8;
 
     std::list<SRInfo*> inputs = _circuit.getInputs();
     for(auto i = inputs.begin(); i != inputs.end(); i++){
@@ -46,12 +43,6 @@ Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     }
 
     _nbrButtons = std::min(nbrButtonsInput, nbrButtonsOutput);
-
-/*
-    _vHub = new VideoHub(2, "192.168.10.51",
-             std::bind(&Chapi::onInputChanged, this, std::placeholders::_1),
-             std::bind(&Chapi::onStatusChanged, this, std::placeholders::_1));
-*/
 }
 
 Chapi::~Chapi() {
@@ -65,7 +56,12 @@ Chapi::~Chapi() {
 }
 
 void Chapi::onConfigSet(){
+    _redLed.off();
+    _greenLed.blinkSlowly();
 
+    _vHub = new VideoHub(_nbrButtons, "192.168.10.51",
+                 std::bind(&Chapi::onInputChanged, this, std::placeholders::_1),
+                 std::bind(&Chapi::onStatusChanged, this, std::placeholders::_1));
 }
 
 void Chapi::exec() {
@@ -163,9 +159,18 @@ void Chapi::onNetworkStatus(bool connected) {
     if(connected){
         log(LOG_DEBUG, "connected");
         _helloer.sayHello();
+        if(_cfg.isSet()) {
+           _redLed.off();
+           _greenLed.blinkSlowly();
+        }
+        else{
+           _redLed.on();
+        }
     }
     else{
         log(LOG_DEBUG, "deconnected");
+        _greenLed.off();
+        _redLed.blinkQuickly();
     }
 }
 
