@@ -3,12 +3,12 @@
 
 #include "config.h"
 #include "helloer.h"
-#include "server.h"
 #include "videohub.h"
 #include "circuitconfig.h"
 #include "led.h"
 
 class LedGroup;
+class Server;
 class ServerCnx;
 
 class Chapi {

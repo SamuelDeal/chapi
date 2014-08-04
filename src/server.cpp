@@ -43,7 +43,7 @@ int Server::getSocketFd() const {
     return _socketFd;
 }
 
-ServerCnx* Server::onNewCnx() {
+void Server::onNewCnx() {
     struct sockaddr_in remoteAddr;
     socklen_t addrSize = sizeof(remoteAddr);
     int cnxFd = accept(_socketFd, (struct sockaddr*) &remoteAddr, &addrSize);
@@ -53,7 +53,6 @@ ServerCnx* Server::onNewCnx() {
 
     ServerCnx *cnx= new ServerCnx(cnxFd, *this);
     _cnx.push_back(cnx);
-    return cnx;
 }
 
 void Server::onCnxClose(ServerCnx *cnx) {

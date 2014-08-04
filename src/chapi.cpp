@@ -13,6 +13,8 @@
 #include "error.h"
 #include "systemutils.h"
 #include "ledgroup.h"
+#include "server.h"
+#include "servercnx.h"
 
 Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     _vHub = NULL;
@@ -103,7 +105,7 @@ void Chapi::exec() {
                 FD_SET(fd, &readFsSet);
                 max = std::max(max, fd);
             }
-            for(auto i = _server->getCnx().begin(); i != server->getCnx().end(); i++){
+            for(auto i = _server->getCnx().begin(); i != _server->getCnx().end(); i++){
                 fd = (*i)->getCnxFd();
                 if(fd != -1){
                     FD_SET(fd, &readFsSet);
@@ -142,7 +144,7 @@ void Chapi::exec() {
             }
         }
         if(_server != NULL) {
-            for(auto i = _server->getCnx().begin(); i != server->getCnx().end(); i++){
+            for(auto i = _server->getCnx().begin(); i != _server->getCnx().end(); i++){
                 if(FD_ISSET((*i)->getCnxFd(), &readFsSet)) {
                     (*i)->onData();
                 }
