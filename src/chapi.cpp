@@ -146,10 +146,12 @@ void Chapi::exec() {
         if(_server != NULL) {
             for(auto i = _server->getCnx().begin(); i != _server->getCnx().end(); i++){
                 if(FD_ISSET((*i)->getCnxFd(), &readFsSet)) {
+                    log(LOG_DEBUG, "on data");
                     (*i)->onData();
                 }
             }
             if(FD_ISSET(_server->getSocketFd(), &readFsSet)){
+                log(LOG_DEBUG, "creating cnx");
                 _server->onNewCnx();
             }
         }
@@ -185,6 +187,7 @@ void Chapi::onNetworkStatus(bool connected) {
            _redLed.on();
         }
         if(_server == NULL){
+            log(LOG_DEBUG, "creating server");
             _server = new Server();
         }
     }
