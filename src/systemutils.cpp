@@ -122,7 +122,7 @@ void SystemUtils::delay(float usec) {
     struct timespec sleeper, dummy ;
 
     sleeper.tv_sec = (time_t)(usec / 1000000) ;
-    sleeper.tv_nsec = (long)(((long)usec) % 1000000) * 1000000000 ;
+    sleeper.tv_nsec = (time_t)(((time_t)usec) % 1000000) * 1000000000 ;
 
     nanosleep(&sleeper, &dummy) ;
 }
