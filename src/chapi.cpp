@@ -120,6 +120,15 @@ void Chapi::exec() {
                 }
             }
         }
+        for(auto i = _btns.begin(); i != _btns.end(); i++){
+            fd = (*i)->getPipe().getReadFd();
+            if(fd != -1){
+                FD_SET(fd, &readFsSet);
+                max = std::max(max, fd);
+            }
+        }
+
+
 
         if(select(max+1, &readFsSet, NULL, NULL, NULL) == -1) {
             log(LOG_ERR, "unable to listen file descriptors: %s", strerror(errno));
@@ -166,6 +175,12 @@ void Chapi::exec() {
                 log(LOG_DEBUG, "creating cnx");
                 ServerCnx *newCnx = _server->onNewCnx();
                 newCnx->sendConfig(_cfg, _nbrButtons);
+            }
+        }
+        for(auto i = _btns.begin(); i != _btns.end(); i++){
+            if(FD_ISSET((*i)->getPipe().getReadFd(), &readFsSet)) {
+                ButtonGroup::ButtonEvent evt = (*i)->getPipe().read();
+                log(LOG_DEBUG, "btn %d %s", evt.index, evt.eventType == ButtonGroup::press ? "pressed" : "released");
             }
         }
     }

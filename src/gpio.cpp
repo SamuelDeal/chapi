@@ -16,7 +16,7 @@ Gpio::Value Gpio::In::read() {
 #ifdef NOGPIO
     return Gpio::Low;
 #else
-    return (digitalRead((int)_pin) == HIGH) ? Gpio::High : Gpio::Low;
+    return ((digitalRead((int)_pin) == HIGH) ? Gpio::High : Gpio::Low);
 #endif
 }
 

@@ -30,6 +30,7 @@ ButtonGroup::ButtonGroup(const SRInfo &info, unsigned int offset) :
         }
         ++index;
     }
+    _previous.resize(_size, false);
 
     pthread_create(&_thread, NULL, ButtonGroup::_startThread, (void*)this);
 }
@@ -110,12 +111,12 @@ void ButtonGroup::_start(){
 
 void ButtonGroup::readButtons() {
     _latchPin.write(Gpio::High);
+
+    std::vector<bool> results;
+    results.resize(_size, false);
+
     for(unsigned char i=0; i < _size; i++) {
-          //unsigned char computedIndex = ((i%8) < 4) ? i : (8 - (i%4) - 1);
-          //result[computedIndex] = integrate(i, digitalRead(DATA_PIN));
-
-        std::cout << ((_dataPin.read() == Gpio::High) ? "1" : "0");
-
+        results[_mapping[_size - i - 1]] = _dataPin.read() == Gpio::High;
 
         _clockPin.write(Gpio::High);
         SystemUtils::delay(1);
@@ -123,5 +124,12 @@ void ButtonGroup::readButtons() {
         SystemUtils::delay(1);
     }
     _latchPin.write(Gpio::Low);
-    std::cout << std::endl;
+
+    for(unsigned int i = 0; i < _size; i++){
+        if(results[i] != _previous[i]) {
+            _eventPipe.send(ButtonEvent(results[i]?press:release, i+_offset));
+            _previous[i] = results[i];
+        }
+    }
+
 }

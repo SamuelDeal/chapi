@@ -2,7 +2,7 @@
 #define BUTTONGROUP_H
 
 #include <map>
-#include <mutex>
+#include <vector>
 
 #include "srinfo.h"
 #include "gpio.h"
@@ -43,7 +43,7 @@ private:
     Pipe<ButtonEvent> _eventPipe;
     Pipe<unsigned char> _quitPipe;
     pthread_t _thread;
-    std::mutex _mut;
+    std::vector<bool> _previous;
 
     Gpio::In _dataPin;
     Gpio::Out _clockPin;
