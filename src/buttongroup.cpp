@@ -6,8 +6,9 @@
 #include "error.h"
 #include "systemutils.h"
 
+#include <iostream>
 
-unsigned char ButtonGroup::QUIT;
+unsigned char ButtonGroup::QUIT = 2;
 
 ButtonGroup::ButtonEvent::ButtonEvent(EventType argEventType, int argIndex){
     eventType = argEventType;
@@ -34,7 +35,7 @@ ButtonGroup::ButtonGroup(const SRInfo &info, unsigned int offset) :
 }
 
 ButtonGroup::~ButtonGroup(){
-    _pipe.send(ButtonEvent(quit));
+    _quitPipe.send(QUIT);
 
     //wait thread for 3sec
     timespec ts;
@@ -54,7 +55,7 @@ unsigned char ButtonGroup::getNbrButtons() const {
 }
 
 Pipe<ButtonGroup::ButtonEvent> ButtonGroup::getPipe() const {
-    return _pipe;
+    return _eventPipe;
 }
 
 void* ButtonGroup::_startThread(void *btnGroup){
@@ -113,7 +114,7 @@ void ButtonGroup::readButtons() {
           //unsigned char computedIndex = ((i%8) < 4) ? i : (8 - (i%4) - 1);
           //result[computedIndex] = integrate(i, digitalRead(DATA_PIN));
 
-        std::cout << (_dataPin.read() == Gpio::High) ? "1" : "0";
+        std::cout << ((_dataPin.read() == Gpio::High) ? "1" : "0");
 
 
         _clockPin.write(Gpio::High);

@@ -17,7 +17,7 @@ public:
     };
 
     struct ButtonEvent{
-        ButtonEvent(EventType argEventType = none, int argIndex = -1);
+        ButtonEvent(EventType argEventType = press, int argIndex = -1);
 
         EventType eventType;
         int index;
@@ -30,7 +30,7 @@ public:
     Pipe<ButtonEvent> getPipe() const;
 
 private:
-    static unsigned char QUIT = 2;
+    static unsigned char QUIT;
 
     static void* _startThread(void*);
     void _start();
