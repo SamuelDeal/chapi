@@ -91,8 +91,7 @@ void ButtonGroup::readButtons() {
     results.resize(_size, false);
 
     for(int i=0; i < _size; i++) {
-        results[_mapping[_size - i - 1]] = _dataPin.read() == Gpio::High;
-
+        results[_size - i - 1] = _dataPin.read() == Gpio::High;
         _clockPin.write(Gpio::High);
         SystemUtils::delay(1);
         _clockPin.write(Gpio::Low);
@@ -102,7 +101,9 @@ void ButtonGroup::readButtons() {
 
     for(int i = 0; i < _size; i++){
         if(results[i] != _previous[i]) {
-            _eventPipe.send(ButtonEvent(results[i]? press:release, _mapping[i]+_offset));
+            if(_mapping.find(i) != _mapping.end()) {
+                _eventPipe.send(ButtonEvent(results[i]? press:release, _mapping[i]+_offset));
+            }
             _previous[i] = results[i];
         }
     }
