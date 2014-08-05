@@ -7,8 +7,8 @@ OBJS = $(SRCS:.cpp=.o)
 
 
 
-CPPFLAGS_SPECIFIC += -std=c++11 -Wall -O3 -lrt -lpthread
-LDFLAGS_SPECIFIC += -lpthread -Wall -O3 -lrt -lpthread
+CPPFLAGS_SPECIFIC += -std=c++11 -Wall -g -lrt -lpthread
+LDFLAGS_SPECIFIC += -lpthread -Wall -g -lrt -lpthread
 LIBS +=
 CXX = g++
 
