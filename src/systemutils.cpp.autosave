@@ -118,7 +118,7 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-void SystemUtils::delay(unsigned double usec) {
+void SystemUtils::delay(double usec) {
     struct timespec sleeper, dummy ;
 
     sleeper.tv_sec = (time_t)(usec / 1000000) ;
