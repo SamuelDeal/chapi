@@ -121,7 +121,7 @@ void Chapi::exec() {
             }
         }
         for(auto i = _btns.begin(); i != _btns.end(); i++){
-            fd = (*i)->getPipe().getReadFd();
+            fd = (*i)->getEventFd();
             if(fd != -1){
                 FD_SET(fd, &readFsSet);
                 max = std::max(max, fd);
@@ -178,8 +178,8 @@ void Chapi::exec() {
             }
         }
         for(auto i = _btns.begin(); i != _btns.end(); i++){
-            if(FD_ISSET((*i)->getPipe().getReadFd(), &readFsSet)) {
-                ButtonGroup::ButtonEvent evt = (*i)->getPipe().read();
+            if(FD_ISSET((*i)->getEventFd(), &readFsSet)) {
+                ButtonGroup::ButtonEvent evt = (*i)->getEvent();
                 log(LOG_DEBUG, "btn %d %s", evt.index, evt.eventType == ButtonGroup::press ? "pressed" : "released");
             }
         }

@@ -12,12 +12,13 @@ class ButtonGroup
 {
 public:
     enum EventType{
+        none,
         press,
         release
     };
 
     struct ButtonEvent{
-        ButtonEvent(EventType argEventType = press, int argIndex = -1);
+        ButtonEvent(EventType argEventType = none, int argIndex = -1);
 
         EventType eventType;
         int index;
@@ -27,7 +28,8 @@ public:
     ~ButtonGroup();
 
     unsigned char getNbrButtons() const;
-    Pipe<ButtonEvent> getPipe() const;
+    int getEventFd() const;
+    ButtonEvent getEvent();
 
 private:
     static unsigned char QUIT;

@@ -55,8 +55,12 @@ unsigned char ButtonGroup::getNbrButtons() const {
     return _nbrBtns;
 }
 
-Pipe<ButtonGroup::ButtonEvent> ButtonGroup::getPipe() const {
-    return _eventPipe;
+int ButtonGroup::getEventFd() const {
+    return _eventPipe.getReadFd();
+}
+
+ButtonGroup::ButtonEvent ButtonGroup::getEvent() {
+    return _eventPipe.read();
 }
 
 void* ButtonGroup::_startThread(void *btnGroup){
@@ -115,7 +119,7 @@ void ButtonGroup::readButtons() {
     std::vector<bool> results;
     results.resize(_size, false);
 
-    for(unsigned char i=0; i < _size; i++) {
+    for(int i=0; i < _size; i++) {
         results[_mapping[_size - i - 1]] = _dataPin.read() == Gpio::High;
 
         _clockPin.write(Gpio::High);
@@ -125,7 +129,7 @@ void ButtonGroup::readButtons() {
     }
     _latchPin.write(Gpio::Low);
 
-    for(unsigned int i = 0; i < _size; i++){
+    for(int i = 0; i < _size; i++){
         if(results[i] != _previous[i]) {
             _eventPipe.send(ButtonEvent(results[i]?press:release, i+_offset));
             _previous[i] = results[i];
