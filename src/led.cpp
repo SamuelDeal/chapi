@@ -81,6 +81,7 @@ void Led::blinkQuickly() {
 }
 
 void Led::blinkNumber(unsigned int number) {
+    off();
     const std::lock_guard<std::mutex> lock(_mut);
     _blinkNumber = number;
     _blinkCount = _isOn ? 0 : 1;
