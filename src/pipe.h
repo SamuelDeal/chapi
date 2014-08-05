@@ -9,6 +9,7 @@ class Pipe {
 
         void send(T event) const;
         T read() const;
+        T& read(T&) const;
         int getReadFd() const;
 
     protected:
@@ -43,9 +44,17 @@ T Pipe<T>::read() const {
 }
 
 template<typename T>
+T& Pipe<T>::read(T& evt) const {
+    ::read(_fds[0], &evt, sizeof(T));
+    return evt;
+}
+
+template<typename T>
 int Pipe<T>::getReadFd() const {
     return _fds[0];
 }
+
+//TODO: look at typename std::enable_if<std:is_constructible<T>::value, T>::type read() const; or is_scalar
 
 #endif // _PIPE_HPP
 

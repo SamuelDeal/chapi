@@ -5,8 +5,6 @@ all: chapi
 SRCS = $(shell find . -type f -name '*.cpp')
 OBJS = $(SRCS:.cpp=.o)
 
-
-
 CPPFLAGS_SPECIFIC += -std=c++11 -Wall -g -lrt -lpthread
 LDFLAGS_SPECIFIC += -lpthread -Wall -g -lrt -lpthread
 LIBS +=

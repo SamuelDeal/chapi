@@ -29,3 +29,7 @@ Error Error::config(const std::string &str) {
 Error Error::other(const std::string &str) {
     return Error(Error::otherError, str);
 }
+
+Error Error::unknown(const std::string &str){
+    return Error(Error::unknownError, str);
+}

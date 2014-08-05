@@ -5,6 +5,7 @@
 #include "log.h"
 #include "error.h"
 #include "systemutils.h"
+#include "threader.h"
 
 #include <iostream>
 
@@ -31,24 +32,12 @@ ButtonGroup::ButtonGroup(const SRInfo &info, unsigned int offset) :
         ++index;
     }
     _previous.resize(_size, false);
-
-    pthread_create(&_thread, NULL, ButtonGroup::_startThread, (void*)this);
+    _threadIndex = Threader::startThread(this, &ButtonGroup::_start);
 }
 
 ButtonGroup::~ButtonGroup(){
     _quitPipe.send(QUIT);
-
-    //wait thread for 3sec
-    timespec ts;
-    if(clock_gettime(CLOCK_REALTIME, &ts) == -1) {
-        log(LOG_ERR, "clock gettime failed");
-    }
-    else{ ts.tv_sec += 3;
-        int joined = pthread_timedjoin_np(_thread, NULL, &ts);
-        if(joined != 0) {
-            log(LOG_ERR, "unable to join the thread");
-        }
-    }
+    Threader::joinThread(_threadIndex, 1000000);
 }
 
 unsigned char ButtonGroup::getNbrButtons() const {
@@ -61,24 +50,6 @@ int ButtonGroup::getEventFd() const {
 
 ButtonGroup::ButtonEvent ButtonGroup::getEvent() {
     return _eventPipe.read();
-}
-
-void* ButtonGroup::_startThread(void *btnGroup){
-    signal(SIGCHLD,SIG_DFL); // A child process dies
-    signal(SIGTSTP,SIG_IGN); // Various TTY signals
-    signal(SIGTTOU,SIG_IGN);
-    signal(SIGTTIN,SIG_IGN);
-    signal(SIGHUP, SIG_IGN); // Ignore hangup signal
-    signal(SIGINT,SIG_IGN); // ignore SIGTERM
-    signal(SIGQUIT,SIG_IGN); // ignore SIGTERM
-    signal(SIGTERM,SIG_IGN); // ignore SIGTERM
-    signal(SIGUSR1,SIG_IGN);
-    signal(SIGUSR2,SIG_IGN);
-    int oldstate;
-    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
-
-    ((ButtonGroup*)btnGroup)->_start();
-    return NULL;
 }
 
 void ButtonGroup::_start(){
@@ -131,7 +102,7 @@ void ButtonGroup::readButtons() {
 
     for(int i = 0; i < _size; i++){
         if(results[i] != _previous[i]) {
-            _eventPipe.send(ButtonEvent(results[i]?press:release, i+_offset));
+            _eventPipe.send(ButtonEvent(results[i]? press:release, _mapping[i]+_offset));
             _previous[i] = results[i];
         }
     }

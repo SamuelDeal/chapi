@@ -12,6 +12,7 @@ class ButtonGroup;
 class Server;
 class ServerCnx;
 
+
 class Chapi {
 
 public:
@@ -25,6 +26,7 @@ private:
     void onInputChanged(unsigned char input);
     void onNetworkStatus(bool connected);
     void onConfigSet();
+    int initFdSet(fd_set &readFsSet);
 
     Config _cfg;
     Helloer _helloer;

@@ -16,6 +16,7 @@
 #include "buttongroup.h"
 #include "server.h"
 #include "servercnx.h"
+#include "threader.h"
 
 Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     _vHub = NULL;
@@ -74,60 +75,68 @@ void Chapi::onConfigSet(){
                  std::bind(&Chapi::onStatusChanged, this, std::placeholders::_1));
 }
 
+int Chapi::initFdSet(fd_set &readFsSet) {
+    int fd;
+
+    FD_ZERO(&readFsSet);
+    FD_SET(_helloer.getFd(), &readFsSet);
+    int max = _helloer.getFd();
+
+    FD_SET(Threader::getErrorFd(), &readFsSet);
+    max = std::max(max, Threader::getErrorFd());
+
+    FD_SET(_signalFd, &readFsSet);
+    max = std::max(max, _signalFd);
+    if(_vHub != NULL){
+        fd = _vHub->getSocketFd();
+        if(fd != -1){
+            FD_SET(fd, &readFsSet);
+            max = std::max(max, fd);
+        }
+
+        fd = _vHub->getReconnectTimerFd();
+        if(fd != -1){
+            FD_SET(fd, &readFsSet);
+            max = std::max(max, fd);
+        }
+
+        fd = _vHub->getPingTimerFd();
+        if(fd != -1){
+            FD_SET(fd, &readFsSet);
+            max = std::max(max, fd);
+        }
+    }
+    if(_server != NULL) {
+        fd = _server->getSocketFd();
+        if(fd != -1){
+            FD_SET(fd, &readFsSet);
+            max = std::max(max, fd);
+        }
+        for(auto i = _server->getCnx().begin(); i != _server->getCnx().end(); i++){
+            fd = (*i)->getCnxFd();
+            if(fd != -1){
+                FD_SET(fd, &readFsSet);
+                max = std::max(max, fd);
+            }
+        }
+    }
+    for(auto i = _btns.begin(); i != _btns.end(); i++){
+        fd = (*i)->getEventFd();
+        if(fd != -1){
+            FD_SET(fd, &readFsSet);
+            max = std::max(max, fd);
+        }
+    }
+    return max;
+}
+
 void Chapi::exec() {
     bool exit = false;
-    int fd;
     struct signalfd_siginfo fdsi;
 
     while(!exit) {
         fd_set readFsSet;
-        FD_ZERO(&readFsSet);
-        FD_SET(_helloer.getFd(), &readFsSet);
-        int max = _helloer.getFd();
-
-        FD_SET(_signalFd, &readFsSet);
-        max = std::max(max, _signalFd);
-        if(_vHub != NULL){
-            fd = _vHub->getSocketFd();
-            if(fd != -1){
-                FD_SET(fd, &readFsSet);
-                max = std::max(max, fd);
-            }
-
-            fd = _vHub->getReconnectTimerFd();
-            if(fd != -1){
-                FD_SET(fd, &readFsSet);
-                max = std::max(max, fd);
-            }
-
-            fd = _vHub->getPingTimerFd();
-            if(fd != -1){
-                FD_SET(fd, &readFsSet);
-                max = std::max(max, fd);
-            }
-        }
-        if(_server != NULL) {
-            fd = _server->getSocketFd();
-            if(fd != -1){
-                FD_SET(fd, &readFsSet);
-                max = std::max(max, fd);
-            }
-            for(auto i = _server->getCnx().begin(); i != _server->getCnx().end(); i++){
-                fd = (*i)->getCnxFd();
-                if(fd != -1){
-                    FD_SET(fd, &readFsSet);
-                    max = std::max(max, fd);
-                }
-            }
-        }
-        for(auto i = _btns.begin(); i != _btns.end(); i++){
-            fd = (*i)->getEventFd();
-            if(fd != -1){
-                FD_SET(fd, &readFsSet);
-                max = std::max(max, fd);
-            }
-        }
-
+        int max = initFdSet(readFsSet);
 
 
         if(select(max+1, &readFsSet, NULL, NULL, NULL) == -1) {
@@ -145,9 +154,12 @@ void Chapi::exec() {
                 onNetworkStatus(false);
             }
             else { //SIGINT or SIGTERM
-                log(LOG_INFO, "signal received, exiting...");
+                log(LOG_INFO, " signal received, exiting...");
                 exit = true;
             }
+        }
+        if(FD_ISSET(Threader::getErrorFd(), &readFsSet)){
+            Threader::throwError();
         }
         if(FD_ISSET(_helloer.getFd(), &readFsSet)){
             _helloer.onMsgReceived();
@@ -212,7 +224,7 @@ void Chapi::onNetworkStatus(bool connected) {
            _greenLed.blinkSlowly();
         }
         else{
-           _redLed.on();
+           _redLed.blinkSlowly();
         }
         if(_server == NULL){
             log(LOG_DEBUG, "creating server");

@@ -9,12 +9,20 @@
 #include "error.h"
 
 void loop(){
+    sigset_t mask;
+    sigemptyset(&mask);
+    if (sigprocmask(SIG_BLOCK, &mask, NULL) == -1) {
+        log(LOG_ERR, "unable to remove sgnal masks");
+        exit(2);
+    }
+
     while(true) {
         sleep(1);
     }
 }
 
 int main() {
+    int appFailureCode = 1;
     int sigError = -1;
 
     //Ready to catch signals
@@ -40,6 +48,7 @@ int main() {
 
         Chapi chapi(mask, redLed);
         chapi.exec();
+        appFailureCode = 0;
     }
     catch(Error &e){
         log(LOG_ERR, "%s", e.what());
@@ -62,5 +71,6 @@ int main() {
         loop();
     }
     redLed.off();
-    return 0;
+    log(LOG_INFO, "chapi ended");
+    return appFailureCode;
 }

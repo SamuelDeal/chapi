@@ -9,17 +9,19 @@ class Error : public std::exception
 {
 public:
     enum Kind {
+        noneError,
         systemError,
         configError,
-        otherError
+        otherError,
+        unknownError
     };
 
     static Error system(const std::string &);
     static Error config(const std::string &);
     static Error other(const std::string &);
+    static Error unknown(const std::string &);
 
-
-    Error(Kind, const std::string &);
+    Error(Kind = noneError, const std::string& = "");
 
     Kind getKind() const;
     virtual const char* what() const noexcept(true);

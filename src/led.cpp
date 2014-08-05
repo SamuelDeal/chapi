@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "log.h"
+#include "threader.h"
 
 const char Led::ON;
 const char Led::OFF;
@@ -20,6 +21,7 @@ Led::Led(int ledPin): _pin(ledPin) {
     _isOn = false;
     _status = Led::OFF;
     _blinkCount = 0;
+    _threadIndex = 0;
 }
 
 Led::~Led() {
@@ -60,7 +62,7 @@ void Led::blinkSlowly() {
     }
     else{
         _status = Led::BLINK_SLOWLY;
-        pthread_create(&_thread, NULL, Led::_startBlinking, (void*)this);
+        _threadIndex = Threader::startThread(this, &Led::_blink);
     }
 }
 
@@ -76,7 +78,7 @@ void Led::blinkQuickly() {
     }
     else{
         _status = Led::BLINK_QUICKLY;
-        pthread_create(&_thread, NULL, Led::_startBlinking, (void*)this);
+        _threadIndex = Threader::startThread(this, &Led::_blink);
     }
 }
 
@@ -94,7 +96,7 @@ void Led::blinkNumber(unsigned int number) {
     }
     else{
         _status = Led::BLINK_NUMBER;
-        pthread_create(&_thread, NULL, Led::_startBlinking, (void*)this);
+        _threadIndex = Threader::startThread(this, &Led::_blink);
     }
 }
 
@@ -115,36 +117,8 @@ void Led::_stopBlinking() {
         return;
     }
     _pipe.send(Led::QUIT);
-
-    //wait thread for 3sec
-    timespec ts;
-    if(clock_gettime(CLOCK_REALTIME, &ts) == -1) {
-        log(LOG_ERR, "clock gettime failed");
-    }
-    else{ ts.tv_sec += 3;
-        int joined = pthread_timedjoin_np(_thread, NULL, &ts);
-        if(joined != 0) {
-            log(LOG_ERR, "unable to join the thread");
-        }
-    }
-}
-
-void* Led::_startBlinking(void*led){
-    signal(SIGCHLD,SIG_DFL); // A child process dies
-    signal(SIGTSTP,SIG_IGN); // Various TTY signals
-    signal(SIGTTOU,SIG_IGN);
-    signal(SIGTTIN,SIG_IGN);
-    signal(SIGHUP, SIG_IGN); // Ignore hangup signal
-    signal(SIGINT,SIG_IGN); // ignore SIGTERM
-    signal(SIGQUIT,SIG_IGN); // ignore SIGTERM
-    signal(SIGTERM,SIG_IGN); // ignore SIGTERM
-    signal(SIGUSR1,SIG_IGN);
-    signal(SIGUSR2,SIG_IGN);
-    int oldstate;
-    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
-
-    ((Led*)led)->_blink();
-    return NULL;
+    Threader::joinThread(_threadIndex, 2000000);
+    _threadIndex = 0;
 }
 
 long Led::_getBlinkDelay() {

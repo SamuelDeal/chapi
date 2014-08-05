@@ -1,15 +1,12 @@
 #ifndef _LED_HPP
 #define _LED_HPP
 
-#include <pthread.h>
 #include <mutex>
 
 #include "pipe.h"
 #include "gpio.h"
 
-
-//TODO: perf optim with poll, or better: pwn
-//TODO: good error management
+//TODO: perf optim with poll
 class Led {
     public:
        Led(int ledPin);
@@ -32,7 +29,7 @@ class Led {
        static const long NUMBER_TIME = 250000;
 
        Pipe<char> _pipe;
-       pthread_t _thread;
+       unsigned int _threadIndex;
        std::mutex _mut;
        bool _isOn;
        char _status;
@@ -40,7 +37,6 @@ class Led {
        unsigned int _blinkNumber;
        unsigned int _blinkCount;
 
-       static void* _startBlinking(void*);
        void _light(bool);
        void _stopBlinking();
        bool _blinking();
