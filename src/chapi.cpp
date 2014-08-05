@@ -33,7 +33,7 @@ Chapi::Chapi(sigset_t &mask, Led &redLed) : _greenLed(23), _redLed(redLed) {
     int nbrButtonsInput = 0;
     std::list<SRInfo*> inputs = _circuit.getInputs();
     for(auto i = inputs.begin(); i != inputs.end(); i++){
-        ButtonGroup *btnGroup = new ButtonGroup(**i);
+        ButtonGroup *btnGroup = new ButtonGroup(**i, nbrButtonsInput);
         nbrButtonsInput += btnGroup->getNbrButtons();
         _btns.push_back(btnGroup);
     }

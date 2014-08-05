@@ -1,92 +1,121 @@
 #include "buttongroup.h"
 
-ButtonGroup::ButtonGroup(const SRInfo &info) :
+#include <signal.h>
+
+#include "log.h"
+#include "error.h"
+#include "systemutils.h"
+
+
+ButtonGroup::ButtonEvent::ButtonEvent(EventType argEventType, int argIndex){
+    eventType = argEventType;
+    index = argIndex;
+}
+
+
+ButtonGroup::ButtonGroup(const SRInfo &info, unsigned int offset) :
     _dataPin(info.dataPin), _clockPin(info.clockPin), _latchPin(info.latchPin)
 {
     _size = info.size;
-    _nbrBtns = _size;
+    _offset = offset;
+    _nbrBtns = 0;
+    int index = 0;
+    for(auto i = info.pins.begin(); i != info.pins.end(); i++){
+        if(*i != -1){
+            _mapping[*i] = index;
+            _nbrBtns = std::max((int)_nbrBtns, (*i) + 1);
+        }
+        ++index;
+    }
+
+    pthread_create(&_thread, NULL, ButtonGroup::_startThread, (void*)this);
 }
 
 ButtonGroup::~ButtonGroup(){
+    _pipe.send(ButtonEvent(quit));
+
+    //wait thread for 3sec
+    timespec ts;
+    if(clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+        log(LOG_ERR, "clock gettime failed");
+    }
+    else{ ts.tv_sec += 3;
+        int joined = pthread_timedjoin_np(_thread, NULL, &ts);
+        if(joined != 0) {
+            log(LOG_ERR, "unable to join the thread");
+        }
+    }
 }
 
 unsigned char ButtonGroup::getNbrButtons() const {
     return _nbrBtns;
 }
 
-
-
-
-/*
-#include <wiringPi.h>
-
-#include <unistd.h>
-#include <iostream>
-#include <bitset>
-
-#define CLOCK_PIN 3
-#define DATA_PIN 4
-#define LATCH_PIN 2
-
-#define INTEGRATOR 0
-
-bool integrate(unsigned char i, int value) {
-    static unsigned char tab[8] = {0,0,0,0,0,0,0,0};
-    static bool previous[8] = {false, false, false, false, false, false, false, false};
-
-    if(value == HIGH){
-       tab[i] = std::min((unsigned char)(tab[i]+1), (unsigned char)INTEGRATOR);
-    }
-    else {
-       tab[i] = std::max((unsigned char)(tab[i]-1), (unsigned char)0);
-    }
-
-    if((previous[i]) && (tab[i] == 0)){
-        previous[i] = false;
-    }
-    else if((!previous[i]) && (tab[i] == INTEGRATOR)){
-        previous[i] = true;
-    }
-    return previous[i];
+Pipe<ButtonGroup::ButtonEvent> ButtonGroup::getPipe() const {
+    return _pipe;
 }
 
+void* ButtonGroup::_startThread(void *btnGroup){
+    signal(SIGCHLD,SIG_DFL); // A child process dies
+    signal(SIGTSTP,SIG_IGN); // Various TTY signals
+    signal(SIGTTOU,SIG_IGN);
+    signal(SIGTTIN,SIG_IGN);
+    signal(SIGHUP, SIG_IGN); // Ignore hangup signal
+    signal(SIGINT,SIG_IGN); // ignore SIGTERM
+    signal(SIGQUIT,SIG_IGN); // ignore SIGTERM
+    signal(SIGTERM,SIG_IGN); // ignore SIGTERM
+    signal(SIGUSR1,SIG_IGN);
+    signal(SIGUSR2,SIG_IGN);
+    int oldstate;
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
 
-int main(int argc, char** argv) {
-    std::cout << "Starting..." << std::endl;
-    std::cout << "Type Ctrl-C to quit" << std::endl;
-    wiringPiSetup();
-
-    pinMode(CLOCK_PIN, OUTPUT);
-    pinMode(DATA_PIN, INPUT);
-    pinMode(LATCH_PIN, OUTPUT);
-
-    digitalWrite(CLOCK_PIN, LOW);
-    digitalWrite(LATCH_PIN, LOW);
-
-    bool result[8];
-    for(unsigned char i = 0; i < 8; i++) {
-        result[i] = 0;
-    }
-
-    while(1) {
-        digitalWrite(LATCH_PIN, HIGH);
-        for(unsigned char i=0; i < 8; i++) {
-              //unsigned char computedIndex = ((i%8) < 4) ? i : (8 - (i%4) - 1);
-              //result[computedIndex] = integrate(i, digitalRead(DATA_PIN));
-              result[i] = digitalRead(DATA_PIN);
-              digitalWrite(CLOCK_PIN, HIGH);
-              delay(10);
-              digitalWrite(CLOCK_PIN, LOW);
-        }
-        digitalWrite(LATCH_PIN, LOW);
-        delay(10);
-        std::cout << "read: ";
-        for(int i = 0; i < 8; i++){
-            std::cout << (result[i] ? "1 " : "0 ");
-        }
-        std::cout << std::endl;
-    }
-
-    return 0;
+    ((ButtonGroup*)btnGroup)->_start();
+    return NULL;
 }
-*/
+
+void ButtonGroup::_start(){
+    bool exit = false;
+    while(!exit) {
+        fd_set rfds;
+        struct timeval tv;
+        int retval;
+
+        FD_ZERO(&rfds);
+        FD_SET(_pipe.getReadFd(), &rfds);
+        tv.tv_sec = 0;
+        tv.tv_usec = 1000;
+
+        retval = select(_pipe.getReadFd()+1, &rfds, NULL, NULL, &tv);
+        if(retval == -1) {
+            log(LOG_ERR, "select() failed");
+            exit = true;
+        }
+        else if (!retval) {  // timeout
+            readButtons();
+        }
+        else{
+            ButtonEvent evt = _pipe.read();
+            if(evt.eventType == quit) {
+                exit = true;
+            }
+            else {
+                throw Error::system("this shuld not happened");
+            }
+        }
+    }
+}
+
+void ButtonGroup::readButtons() {
+    _latchPin.write(Gpio::High);
+    for(unsigned char i=0; i < _size; i++) {
+          //unsigned char computedIndex = ((i%8) < 4) ? i : (8 - (i%4) - 1);
+          //result[computedIndex] = integrate(i, digitalRead(DATA_PIN));
+
+          //_dataPin.read() == Gpio::High;
+
+          _clockPin.write(Gpio::High);
+          SystemUtils::delay(10);
+          _clockPin.write(Gpio::Low);
+    }
+    _latchPin.write(Gpio::Low);
+}
