@@ -7,6 +7,8 @@
 #include "systemutils.h"
 
 
+unsigned char ButtonGroup::QUIT;
+
 ButtonGroup::ButtonEvent::ButtonEvent(EventType argEventType, int argIndex){
     eventType = argEventType;
     index = argIndex;
@@ -81,11 +83,11 @@ void ButtonGroup::_start(){
         int retval;
 
         FD_ZERO(&rfds);
-        FD_SET(_pipe.getReadFd(), &rfds);
+        FD_SET(_quitPipe.getReadFd(), &rfds);
         tv.tv_sec = 0;
         tv.tv_usec = 1000;
 
-        retval = select(_pipe.getReadFd()+1, &rfds, NULL, NULL, &tv);
+        retval = select(_quitPipe.getReadFd()+1, &rfds, NULL, NULL, &tv);
         if(retval == -1) {
             log(LOG_ERR, "select() failed");
             exit = true;
@@ -94,8 +96,8 @@ void ButtonGroup::_start(){
             readButtons();
         }
         else{
-            ButtonEvent evt = _pipe.read();
-            if(evt.eventType == quit) {
+            unsigned char quitRead = _quitPipe.read();
+            if(QUIT == quitRead) {
                 exit = true;
             }
             else {
@@ -111,11 +113,14 @@ void ButtonGroup::readButtons() {
           //unsigned char computedIndex = ((i%8) < 4) ? i : (8 - (i%4) - 1);
           //result[computedIndex] = integrate(i, digitalRead(DATA_PIN));
 
-          //_dataPin.read() == Gpio::High;
+        std::cout << (_dataPin.read() == Gpio::High) ? "1" : "0";
 
-          _clockPin.write(Gpio::High);
-          SystemUtils::delay(10);
-          _clockPin.write(Gpio::Low);
+
+        _clockPin.write(Gpio::High);
+        SystemUtils::delay(1);
+        _clockPin.write(Gpio::Low);
+        SystemUtils::delay(1);
     }
     _latchPin.write(Gpio::Low);
+    std::cout << std::endl;
 }

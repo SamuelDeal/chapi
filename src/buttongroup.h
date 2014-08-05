@@ -12,10 +12,8 @@ class ButtonGroup
 {
 public:
     enum EventType{
-        none = 0,
         press,
-        release,
-        quit
+        release
     };
 
     struct ButtonEvent{
@@ -32,6 +30,8 @@ public:
     Pipe<ButtonEvent> getPipe() const;
 
 private:
+    static unsigned char QUIT = 2;
+
     static void* _startThread(void*);
     void _start();
     void readButtons();
@@ -40,7 +40,8 @@ private:
     int _size;
     unsigned int _offset;
     std::map<int, int> _mapping;
-    Pipe<ButtonEvent> _pipe;
+    Pipe<ButtonEvent> _eventPipe;
+    Pipe<unsigned char> _quitPipe;
     pthread_t _thread;
     std::mutex _mut;
 
