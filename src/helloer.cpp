@@ -34,7 +34,6 @@ Helloer::Helloer()
         throw Error::system("listener bind failed");
     }
     fcntl(_socket, F_SETFL, O_NONBLOCK);
-    log(LOG_DEBUG, "helloer constructor");
 }
 
 Helloer::~Helloer() {
@@ -46,12 +45,6 @@ void Helloer::sayHello() {
 
     unsigned int broadcastIp = SystemUtils::ipStrToInt(SystemUtils::getCurrentIp()) | (~ SystemUtils::ipStrToInt(SystemUtils::getCurrentMask()));
     std::string broadcastStr = SystemUtils::ipIntToStr(broadcastIp);
-
-
-    log(LOG_DEBUG, "ip %d %s %s", SystemUtils::ipStrToInt(SystemUtils::getCurrentIp()), SystemUtils::getCurrentIp().c_str(),
-        SystemUtils::ipIntToStr(SystemUtils::ipStrToInt(SystemUtils::getCurrentIp())).c_str());
-    log(LOG_DEBUG, "mask %d %s", SystemUtils::ipStrToInt(SystemUtils::getCurrentMask()), SystemUtils::getCurrentMask().c_str());
-    log(LOG_DEBUG, "broadast %d %s", broadcastIp, broadcastStr.c_str());
 
     struct sockaddr_in recvaddr;
     recvaddr.sin_family = AF_INET;
@@ -69,9 +62,6 @@ void Helloer::sayHello() {
     if(-1 == sent) {
         log(LOG_ERR, "say hello : send failed at %s", broadcastStr.c_str());
     }
-    else{
-        log(LOG_DEBUG, "say hello : sent %d at %s", sent, broadcastStr.c_str());
-    }
 }
 
 int Helloer::getFd() const {
@@ -79,7 +69,6 @@ int Helloer::getFd() const {
 }
 
 void Helloer::onMsgReceived() {
-    log(LOG_DEBUG, "hello : received");
     struct sockaddr_in sendaddr;
     sendaddr.sin_family = AF_INET;
     sendaddr.sin_port = htons(CHAPI_BROADCAST_PORT);
@@ -94,7 +83,6 @@ void Helloer::onMsgReceived() {
     } while(receivedSize > 0);
 
     if(ETime::oneSecond() > ETime() - _lastHelloTime) {
-        log(LOG_DEBUG, "not responding because it's too early");
         return; // We've just said hello, don't repeat it ad vitaem
     }
     sayHello();
