@@ -36,6 +36,6 @@ bool ETime::operator>(const ETime &otherTime) const{
         return false;
         std::cout<< "comp " << _data.tv_sec << "<" << otherTime._data.tv_sec << "=> false"  << std::endl;
     }
-    std::cout<< "comp " << _data.tv_usec << ">" << otherTime._data.tv_usec << "=> " << (_data.tv_usec > otherTime._data.tv_usec) ? "true" : "false" << std::endl;
+    std::cout<< "comp " << _data.tv_usec << ">" << otherTime._data.tv_usec << "=> " << ((_data.tv_usec > otherTime._data.tv_usec) ? "true" : "false") << std::endl;
     return _data.tv_usec > otherTime._data.tv_usec;
 }

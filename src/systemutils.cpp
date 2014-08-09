@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sys/timerfd.h>
 #include <unistd.h>
+#include <sstream>
 
 #include "log.h"
 
@@ -74,6 +75,51 @@ std::string SystemUtils::getCurrentIp() {
     return result;
 }
 
+std::string SystemUtils::getCurrentMask() {
+    struct ifaddrs * ifAddrStruct=NULL;
+    struct ifaddrs * ifa=NULL;
+    void * tmpAddrPtr=NULL;
+    std::string result = "255.255.255.0";
+    getifaddrs(&ifAddrStruct);
+
+    for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if(ifa->ifa_addr->sa_family != AF_INET) {
+            continue; //not IPv4, ignored
+        }
+
+        tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_netmask)->sin_addr;
+
+        char addressBuffer[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+        if(strcmp(ifa->ifa_name, "eth0") == 0){
+            result = addressBuffer;
+            break;
+        }
+    }
+    if (ifAddrStruct!=NULL) {
+        freeifaddrs(ifAddrStruct);
+    }
+    return result;
+}
+
+unsigned int SystemUtils::ipStrToInt(const std::string &ip) {
+    std::stringstream stream(ip);
+    unsigned int a,b,c,d;
+    char ch;
+    stream >> a >> ch >> b >> ch >> c >> ch >> d;
+    return ((a*256 + b)*256 + c)*256 + d;
+}
+
+std::string SystemUtils::ipIntToStr(unsigned int ip) {
+    unsigned int bytes[4];
+    bytes[0] = ip & 0xFF;
+    bytes[1] = (ip >> 8) & 0xFF;
+    bytes[2] = (ip >> 16) & 0xFF;
+    bytes[3] = (ip >> 24) & 0xFF;
+    std::stringstream stream;
+    stream << bytes[3] << '.' << bytes[2] << '.' << bytes[1] << '.' << bytes[0];
+    return stream.str();
+}
 
 int SystemUtils::initTimer(itimerspec *interval, unsigned int msDelay, bool repeat) {
     int fd = -1;

@@ -44,10 +44,19 @@ Helloer::~Helloer() {
 void Helloer::sayHello() {
     _lastHelloTime = ETime();
 
+    unsigned int broadcastIp = SystemUtils::ipStrToInt(SystemUtils::getCurrentIp()) | (~ SystemUtils::ipStrToInt(SystemUtils::getCurrentMask()));
+    std::string broadcastStr = SystemUtils::ipIntToStr(broadcastIp);
+
+
+    log(LOG_DEBUG, "ip %d %s %s", SystemUtils::ipStrToInt(SystemUtils::getCurrentIp()), SystemUtils::getCurrentIp().c_str(),
+        SystemUtils::ipIntToStr(SystemUtils::ipStrToInt(SystemUtils::getCurrentIp())).c_str());
+    log(LOG_DEBUG, "mask %d %s", SystemUtils::ipStrToInt(SystemUtils::getCurrentMask()), SystemUtils::getCurrentMask().c_str());
+    log(LOG_DEBUG, "broadast %d %s", broadcastIp, broadcastStr.c_str());
+
     struct sockaddr_in recvaddr;
     recvaddr.sin_family = AF_INET;
     recvaddr.sin_port = htons(CHAPI_BROADCAST_PORT);
-    recvaddr.sin_addr.s_addr = inet_addr("255.255.255.255");
+    recvaddr.sin_addr.s_addr = inet_addr(broadcastStr.c_str());
     memset(recvaddr.sin_zero, '\0', sizeof(recvaddr.sin_zero));
 
     std::string msg = "HELLO " DEV_CHAPI_DEVICE " " CURRENT_VERSION " ";
@@ -58,10 +67,10 @@ void Helloer::sayHello() {
 
     int sent = sendto(_socket, msg.c_str(), msg.length(), 0, (struct sockaddr *)&recvaddr, sizeof(recvaddr));
     if(-1 == sent) {
-        log(LOG_ERR, "say hello : send failed");
+        log(LOG_ERR, "say hello : send failed at %s", broadcastStr.c_str());
     }
     else{
-        log(LOG_DEBUG, "say hello : sent %d", sent);
+        log(LOG_DEBUG, "say hello : sent %d at %s", sent, broadcastStr.c_str());
     }
 }
 
