@@ -47,7 +47,7 @@ void Helloer::sayHello() {
     struct sockaddr_in recvaddr;
     recvaddr.sin_family = AF_INET;
     recvaddr.sin_port = htons(CHAPI_BROADCAST_PORT);
-    recvaddr.sin_addr.s_addr = inet_addr("192.168.1.255");
+    recvaddr.sin_addr.s_addr = inet_addr("255.255.255.255");
     memset(recvaddr.sin_zero, '\0', sizeof(recvaddr.sin_zero));
 
     std::string msg = "HELLO " DEV_CHAPI_DEVICE " " CURRENT_VERSION " ";
@@ -79,9 +79,10 @@ void Helloer::onMsgReceived() {
     socklen_t addr_len = sizeof(sendaddr);
 
     char buf[512];
-    while(recvfrom(_socket, buf, sizeof(buf), 0, (struct sockaddr *)&sendaddr, (socklen_t *)&addr_len) > 0) {
-        //I don't care about what I've received, but we need to read it for next polling
-    }
+    int receivedSize;
+    do {
+        receivedSize = recvfrom(_socket, buf, sizeof(buf), 0, (struct sockaddr *)&sendaddr, (socklen_t *)&addr_len);
+    } while(receivedSize > 0);
 
     if(ETime::oneSecond() > ETime() - _lastHelloTime) {
         log(LOG_DEBUG, "not responding because it's too early");

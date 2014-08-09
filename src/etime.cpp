@@ -21,7 +21,7 @@ ETime::ETime(long sec, long usec){
 }
 
 ETime ETime::operator-(const ETime &otherTime) const {
-    long long int diff = (otherTime._data.tv_usec + 1000000 * otherTime._data.tv_sec) - (_data.tv_usec + 1000000 * _data.tv_sec);
+    long long int diff = (_data.tv_usec + 1000000  * _data.tv_sec) - (otherTime._data.tv_usec + 1000000 * otherTime._data.tv_sec);
     return ETime(diff / 1000000, diff % 1000000);
 }
 
