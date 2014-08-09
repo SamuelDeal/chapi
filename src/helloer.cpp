@@ -47,7 +47,7 @@ void Helloer::sayHello() {
     struct sockaddr_in recvaddr;
     recvaddr.sin_family = AF_INET;
     recvaddr.sin_port = htons(CHAPI_BROADCAST_PORT);
-    recvaddr.sin_addr.s_addr = inet_addr("255.255.255.255");
+    recvaddr.sin_addr.s_addr = inet_addr("192.168.1.255");
     memset(recvaddr.sin_zero, '\0', sizeof(recvaddr.sin_zero));
 
     std::string msg = "HELLO " DEV_CHAPI_DEVICE " " CURRENT_VERSION " ";
