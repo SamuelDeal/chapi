@@ -8,7 +8,6 @@ const ETime& ETime::oneSecond() {
     return constant;
 }
 
-
 ETime::ETime() {
     gettimeofday(&_data, NULL);
 }

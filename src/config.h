@@ -8,15 +8,16 @@ class Config {
 public:
     Config();
 
+    void clear();
     void load();
     void save();
-    bool isSet() const;
+    bool isEmpty() const;
+    bool isSet(const std::string&) const;
     std::string get(const std::string &key, const std::string &defaultVal = "");
     void set(const std::string &key, const std::string &value);
 
 private:
     std::map<std::string, std::string> _kvs;
-    bool _isSet;
 };
 
 #endif // CONFIG_H

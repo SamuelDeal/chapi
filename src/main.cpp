@@ -1,5 +1,7 @@
 #include <signal.h>
 
+#include <cstdlib>
+
 #include "chapi.h"
 #include "log.h"
 #include "led.h"

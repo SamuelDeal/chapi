@@ -7,7 +7,6 @@
 #include "stringutils.h"
 
 Config::Config(){
-    _isSet = false;
     load();
 }
 
@@ -28,8 +27,16 @@ void Config::load() {
     }
 }
 
-bool Config::isSet() const {
-    return _isSet;
+bool Config::isEmpty() const {
+    return _kvs.empty();
+}
+
+bool Config::isSet(const std::string &key) const{
+    return _kvs.find(key) != _kvs.end();
+}
+
+void Config::clear() {
+    _kvs.clear();
 }
 
 void Config::save() {

@@ -219,7 +219,7 @@ void Chapi::onNetworkStatus(bool connected) {
     if(connected){
         log(LOG_DEBUG, "connected");
         _helloer.sayHello();
-        if(_cfg.isSet()) {
+        if(_cfg.isEmpty()) {
            _redLed.off();
            _greenLed.blinkSlowly();
         }

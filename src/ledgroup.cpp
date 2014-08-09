@@ -1,5 +1,7 @@
 #include "ledgroup.h"
 
+#include <cstdlib>
+
 #include "systemutils.h"
 
 LedGroup::LedGroup(const SRInfo &info):

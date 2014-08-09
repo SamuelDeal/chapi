@@ -1,6 +1,8 @@
 #ifndef SERVERCNX_H
 #define SERVERCNX_H
 
+#include <string>
+
 #include "nlprotocol.h"
 #include "config.h"
 
@@ -24,6 +26,8 @@ private:
 
     NlProtocol *_protocol;
     bool _closed;
+    Config _newConfig;
+    bool _readingConfig;
 };
 
 #endif // SERVERCNX_H
