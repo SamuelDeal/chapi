@@ -1,8 +1,5 @@
 #include <signal.h>
-#include <sys/signalfd.h>
-#include <string.h>
 
-#include "const.h"
 #include "chapi.h"
 #include "log.h"
 #include "led.h"
@@ -43,7 +40,7 @@ int main() {
 
     try{
         if(sigError != -1){
-            throw Error(Error::systemError, std::string("Unable to listen to signals: ") + strerror(sigError));
+            throw Error::system(sigError, "Unable to listen to signals: ");
         }
 
         Chapi chapi(mask, redLed);

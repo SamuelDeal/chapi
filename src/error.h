@@ -17,6 +17,7 @@ public:
     };
 
     static Error system(const std::string &);
+    static Error system(int errCode, const std::string &);
     static Error config(const std::string &);
     static Error other(const std::string &);
     static Error unknown(const std::string &);

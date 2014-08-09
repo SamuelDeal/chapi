@@ -22,6 +22,10 @@ Error Error::system(const std::string &str) {
     return Error(Error::systemError, str + ":" + strerror(err));
 }
 
+Error Error::system(int err, const std::string &str) {
+    return Error(Error::systemError, str + ":" + strerror(err));
+}
+
 Error Error::config(const std::string &str) {
     return Error(Error::configError, str);
 }

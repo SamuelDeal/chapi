@@ -70,6 +70,7 @@ int Helloer::getFd() const {
 }
 
 void Helloer::onMsgReceived() {
+    log(LOG_DEBUG, "hello : received");
     struct sockaddr_in sendaddr;
     sendaddr.sin_family = AF_INET;
     sendaddr.sin_port = htons(CHAPI_BROADCAST_PORT);
@@ -83,6 +84,7 @@ void Helloer::onMsgReceived() {
     }
 
     if(ETime::oneSecond() > ETime() - _lastHelloTime) {
+        log(LOG_DEBUG, "not responding because it's too early");
         return; // We've just said hello, don't repeat it ad vitaem
     }
     sayHello();
