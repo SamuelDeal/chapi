@@ -28,6 +28,10 @@ private:
     void onConfigSet();
     int initFdSet(fd_set &readFsSet);
 
+    void onConfigUpdateStart();
+    void onTargetIpChanged(const std::string &newIp);
+    void onConfigUpdateLoaded(Config &cfg);
+
     Config _cfg;
     Helloer _helloer;
     Server *_server;

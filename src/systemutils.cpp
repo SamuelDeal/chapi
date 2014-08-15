@@ -172,3 +172,49 @@ void SystemUtils::delay(double usec) {
 
     nanosleep(&sleeper, &dummy) ;
 }
+
+/*
+#define READ 0
+#define WRITE 1
+
+pid_t popen2(const char **command, int *outFd, int *inFd)
+{
+    int p_stdin[2], p_stdout[2];
+    pid_t pid;
+
+    if (pipe(p_stdin) != 0 || pipe(p_stdout) != 0)
+        return -1;
+
+    pid = fork();
+
+    if (pid < 0)
+        return pid;
+    else if (pid == 0)
+    {
+        close(p_stdin[WRITE]);
+        dup2(p_stdin[READ], READ);
+        close(p_stdout[READ]);
+        dup2(p_stdout[WRITE], WRITE);
+
+        execvp(*command, command);
+        perror("execvp");
+        exit(1);
+    }
+
+    if (inFd == NULL) {
+        close(p_stdin[WRITE]);
+    }
+    else {
+        *inFd = p_stdin[WRITE];
+    }
+
+    if (outFd == NULL) {
+        close(p_stdout[READ]);
+    }
+    else {
+        *outFd = p_stdout[READ];
+    }
+
+    return pid;
+}
+*/

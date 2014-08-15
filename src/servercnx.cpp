@@ -39,6 +39,14 @@ void ServerCnx::onData() {
     _protocol->read();
 }
 
+void ServerCnx::setCallbacks(std::function<void()> onConfigUpdateStart,
+                  std::function<void(const std::string &)> onTargetIpChanged,
+                  std::function<void(Config &cfg)> onConfigUpdateLoaded) {
+    _onConfigUpdateStart = onConfigUpdateStart;
+    _onTargetIpChanged = onTargetIpChanged;
+    _onConfigUpdateLoaded = onConfigUpdateLoaded;
+}
+
 void ServerCnx::onCommand(NlCommand cmd){
     if(cmd.command == "PING"){
         _protocol->sendCommand("PONG");
@@ -46,7 +54,7 @@ void ServerCnx::onCommand(NlCommand cmd){
     else if(cmd.command == "CONFIG_BEGIN") {
         _readingConfig = true;
         _newConfig.clear();
-        //onConfigUpdateStart();
+        _onConfigUpdateStart();
     }
     else if(cmd.command == "TARGET_TYPE") {
         _newConfig.set("target_type", *cmd.lines.begin());
@@ -59,7 +67,7 @@ void ServerCnx::onCommand(NlCommand cmd){
             _newConfig.set("last_ip", *cmd.lines.begin());
         }
         else {
-            //onTargetIpChanged(*cmd.lines.begin());
+            _onTargetIpChanged(*cmd.lines.begin());
         }
     }
     else if(cmd.command == "NETWORK") {
@@ -89,9 +97,9 @@ void ServerCnx::onCommand(NlCommand cmd){
             }
         }
     }
-    else if(cmd.command == "CONFIG_BEGIN") {
+    else if(cmd.command == "CONFIG_END") {
         _readingConfig = false;
-        //onConfigUpdateLoaded(_newConfig);
+        _onConfigUpdateLoaded(_newConfig);
         _newConfig.clear();
     }
 }

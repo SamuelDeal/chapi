@@ -2,6 +2,8 @@
 #define SERVERCNX_H
 
 #include <string>
+#include <functional>
+
 
 #include "nlprotocol.h"
 #include "config.h"
@@ -18,6 +20,9 @@ public:
     bool isClosed() const;
     void onData();
     void sendConfig(Config &cfg, int nbrButtons);
+    void setCallbacks(std::function<void()> onConfigUpdateStart,
+                      std::function<void(const std::string &)> onTargetIpChanged,
+                      std::function<void(Config &cfg)> onConfigUpdateLoaded);
 
 private:
     void onCommand(NlCommand);
@@ -28,6 +33,9 @@ private:
     bool _closed;
     Config _newConfig;
     bool _readingConfig;
+    std::function<void()> _onConfigUpdateStart;
+    std::function<void(const std::string &)> _onTargetIpChanged;
+    std::function<void(Config &cfg)> _onConfigUpdateLoaded;
 };
 
 #endif // SERVERCNX_H

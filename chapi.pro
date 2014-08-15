@@ -28,7 +28,8 @@ SOURCES += src/main.cpp \
     src/error.cpp \
     src/gpio.cpp \
     src/buttongroup.cpp \
-    src/threader.cpp
+    src/threader.cpp \
+    src/lanscanner.cpp
 
 HEADERS += \
     src/helloer.h \
@@ -52,5 +53,6 @@ HEADERS += \
     src/error.h \
     src/gpio.h \
     src/buttongroup.h \
-    src/threader.h
+    src/threader.h \
+    src/lanscanner.h
 

@@ -186,6 +186,10 @@ void Chapi::exec() {
             if(FD_ISSET(_server->getSocketFd(), &readFsSet)){
                 log(LOG_DEBUG, "creating cnx");
                 ServerCnx *newCnx = _server->onNewCnx();
+                newCnx->setCallbacks(
+                            std::bind(&Chapi::onConfigUpdateStart, this),
+                            std::bind(&Chapi::onTargetIpChanged, this, std::placeholders::_1),
+                            std::bind(&Chapi::onConfigUpdateLoaded, this, std::placeholders::_1));
                 newCnx->sendConfig(_cfg, _nbrButtons);
             }
         }
@@ -196,6 +200,20 @@ void Chapi::exec() {
             }
         }
     }
+}
+
+void Chapi::onConfigUpdateStart(){
+    _greenLed.on();
+    _redLed.on();
+}
+
+void Chapi::onTargetIpChanged(const std::string &newIp) {
+
+}
+
+void Chapi::onConfigUpdateLoaded(Config &cfg) {
+    cfg.save();
+    system("reboot");
 }
 
 void Chapi::onStatusChanged(VideoHub::CnxStatus status) {
@@ -220,11 +238,12 @@ void Chapi::onNetworkStatus(bool connected) {
         log(LOG_DEBUG, "connected");
         _helloer.sayHello();
         if(_cfg.isEmpty()) {
-           _redLed.off();
-           _greenLed.blinkSlowly();
+           _redLed.blinkSlowly();
+           _greenLed.off();
         }
         else{
-           _redLed.blinkSlowly();
+           _redLed.off();
+           _greenLed.blinkQuickly();
         }
         if(_server == NULL){
             log(LOG_DEBUG, "creating server");
