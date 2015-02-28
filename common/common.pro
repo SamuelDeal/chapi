@@ -1,17 +1,11 @@
-TEMPLATE = app
-CONFIG += console static c++-11
-CONFIG -= qt
+TEMPLATE = lib
+CONFIG = staticlib c++-11
 
 QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -lrt -lpthread
 DEFINES += "NOGPIO=1"
 LIBS += -pthread
 
-
-target.path = /usr/bin/chapi
-INSTALLS += target
-
-SOURCES += src/main.cpp \
-    src/helloer.cpp \
+SOURCES += src/helloer.cpp \
     src/networkconfig.cpp \
     src/etime.cpp \
     src/nlprotocol.cpp \

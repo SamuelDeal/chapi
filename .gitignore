@@ -1,4 +1,7 @@
 *.user*
-chapi
+chapi/chapi
+blink/blink
+*.a
 *.o
 *.autosave
+.Trash-*
