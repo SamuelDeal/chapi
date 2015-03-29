@@ -4,3 +4,4 @@ blink/blink
 *.a
 *.o
 *.autosave
+.Trash-*

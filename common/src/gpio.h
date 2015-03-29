@@ -11,12 +11,13 @@ enum Value {
 };
 
 class Core {
-protected:
+public:
     enum Direction {
         In,
         Out
     };
 
+protected:
     unsigned char _pin;
 
     Core(unsigned char pin, Direction dir);
@@ -43,7 +44,7 @@ public:
 protected:
     std::string _filepath;
 };
-}
 
+} //end namespace Gpio
 
 #endif // GPIO_H
