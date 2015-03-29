@@ -20,7 +20,9 @@ protected:
     unsigned char _pin;
 
     Core(unsigned char pin, Direction dir);
-    ~Core() throw;
+    ~Core() throw ();
+
+    void set_gpio_dir(unsigned char pin, Direction dir);
 };
 
 
@@ -41,7 +43,7 @@ public:
 protected:
     std::string _filepath;
 };
-
+}
 
 
 #endif // GPIO_H
