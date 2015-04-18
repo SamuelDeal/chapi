@@ -6,7 +6,7 @@ QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -lrt -lpthread
 DEFINES += "NOGPIO=0"
 INCLUDEPATH += ../common/src
 LIBS += -pthread 
-LIBS += -L../common -lcommon
+LIBS += -L../common -lcommon -lrt
 
 target.path = /usr/bin/chapi
 INSTALLS += target

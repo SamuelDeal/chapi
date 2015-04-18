@@ -3,7 +3,7 @@ CONFIG = staticlib c++-11
 
 QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -lrt -lpthread
 DEFINES += "NOGPIO=1"
-LIBS += -pthread
+LIBS += -pthread -lrt
 
 SOURCES += src/helloer.cpp \
     src/networkconfig.cpp \
